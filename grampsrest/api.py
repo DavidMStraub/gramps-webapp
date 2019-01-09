@@ -8,7 +8,6 @@ CORS(app)
 api = Api(app)
 
 tree = Db('Straub')
-tree.open()
 
 
 parser = reqparse.RequestParser()
@@ -22,13 +21,14 @@ nd = NameDisplay()
 def person_to_dict(p):
     return {
     'gramps_id': p.gramps_id,
-    'name_display': nd.display(p),
     'name_given': nd.display_given(p),
     'name_surname': p.primary_name.get_surname(),
     }
 
 
-def get_people(db, gids=None):
+def get_people(gids=None):
+    if not tree.dbstate.open:
+        tree.open()
     db = tree.dbstate.db
     if gids is None:
         return [person_to_dict(p) for p in db.iter_people()]
@@ -37,16 +37,13 @@ def get_people(db, gids=None):
 
 class Person(Resource):
     def get(self, gid):
-        args = parser.parse_args()
         gids = gid.split(',')
-        db = tree.dbstate.db
-        return get_people(db, gids)
+        return get_people(gids)
 
 
 class People(Resource):
     def get(self):
-        db = tree.dbstate.db
-        return get_people(db)
+        return get_people()
 
 
 api.add_resource(People, '/people')
