@@ -2,6 +2,7 @@ from gramps.gen.display.name import NameDisplay
 from gramps.gen.const import GRAMPS_LOCALE as locale
 from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.const import GRAMPS_LOCALE as glocale
+from gramps.gen.utils.db import get_marriage_or_fallback
 
 
 nd = NameDisplay()
@@ -55,6 +56,75 @@ def get_event_place_from_handle(db, handle):
     return place_displayer.display(db, place)
 
 
+def get_marriageplace(db, f):
+    ev = get_marriage_or_fallback(db, f)
+    if not ev:
+        return ''
+    return get_event_place_from_handle(db, ev.handle)
+
+
+def get_marriagedate(db, f):
+    ev = get_marriage_or_fallback(db, f)
+    if not ev:
+        return ''
+    return get_event_date_from_handle(db, ev.handle)
+
+
+def get_father_id(db, f):
+    handle = f.father_handle
+    if not handle:
+        return ''
+    return db.get_person_from_handle(handle).gramps_id
+
+
+def get_name_from_handle(db, handle):
+    p = db.get_person_from_handle(handle)
+    sn = p.primary_name.get_surname()
+    gn = nd.display_given(p)
+    return '{}, {}'.format(sn, gn)
+
+
+def get_father_name(db, f):
+    handle = f.father_handle
+    if not handle:
+        return ''
+    return get_name_from_handle(db, handle)
+
+
+def get_mother_id(db, f):
+    handle = f.mother_handle
+    if not handle:
+        return ''
+    return db.get_person_from_handle(handle).gramps_id
+
+
+def get_mother_name(db, f):
+    handle = f.mother_handle
+    if not handle:
+        return ''
+    return get_name_from_handle(db, handle)
+
+
+def get_children_id(db, f):
+    refs = f.child_ref_list
+    if not refs:
+        return []
+    return [db.get_person_from_handle(r.ref).gramps_id for r in refs]
+
+
+def family_to_dict(db, f):
+    return {
+    'gramps_id': f.gramps_id,
+    'marriagedate': get_marriagedate(db, f),
+    'marriageplace': get_marriageplace(db, f),
+    'father_id': get_father_id(db, f),
+    'mother_id': get_mother_id(db, f),
+    'father_name': get_father_name(db, f),
+    'mother_name': get_mother_name(db, f),
+    'children': get_children_id(db, f),
+    }
+
+
 def person_to_dict(db, p):
     return {
     'gramps_id': p.gramps_id,
@@ -68,10 +138,13 @@ def person_to_dict(db, p):
 
 
 def get_people(tree):
-    if not tree.dbstate.is_open():
-        tree.open()
     db = tree.dbstate.db
     return {p.gramps_id: person_to_dict(db, p) for p in db.iter_people()}
+
+
+def get_families(tree):
+    db = tree.dbstate.db
+    return {f.gramps_id: family_to_dict(db, f) for f in db.iter_families()}
 
 
 def get_translation(strings):

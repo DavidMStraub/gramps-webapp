@@ -20,6 +20,6 @@ class Db():
         # self.dbman.break_lock(self.path)
         return self.smgr.open_activate(self.path)
 
-    def close(self):
+    def close(self, *args, **kwargs):
         if self.dbstate.is_open():
-            return self.dbstate.db.close()
+            return self.dbstate.db.close(*args, **kwargs)
