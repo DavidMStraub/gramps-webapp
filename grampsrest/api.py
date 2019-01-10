@@ -1,50 +1,42 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import reqparse,  Api, Resource
+import json
 from .db import Db
+from .gramps import get_people, get_translation
+
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
+
+parser = reqparse.RequestParser()
+parser.add_argument('strings', type=str)
+
+
 tree = Db('Straub')
 
 
-parser = reqparse.RequestParser()
-parser.add_argument('fields', type=str)
-
-
-from gramps.gen.display.name import NameDisplay
-nd = NameDisplay()
-
-
-def person_to_dict(p):
-    return {
-    'gramps_id': p.gramps_id,
-    'name_given': nd.display_given(p),
-    'name_surname': p.primary_name.get_surname(),
-    }
-
-
-def get_people(gids=None):
-    if not tree.dbstate.open:
-        tree.open()
-    db = tree.dbstate.db
-    if gids is None:
-        return [person_to_dict(p) for p in db.iter_people()]
-    return [person_to_dict(db.get_person_from_gramps_id(gid)) for gid in gids]
-
-
-class Person(Resource):
-    def get(self, gid):
-        gids = gid.split(',')
-        return get_people(gids)
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    tree.close()
 
 
 class People(Resource):
     def get(self):
-        return get_people()
+        return get_people(tree)
+
+
+class Translate(Resource):
+    def get(self):
+        args = parser.parse_args()
+        try:
+            strings = json.loads(args['strings'])
+        except (json.decoder.JSONDecodeError, TypeError, ValueError) as e:
+            return {"error": str(e)}
+        return {"data": get_translation(strings)}
 
 
 api.add_resource(People, '/people')
-api.add_resource(Person, '/people/<gid>')
+api.add_resource(Translate, '/translate')

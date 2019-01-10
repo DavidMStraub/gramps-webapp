@@ -17,5 +17,9 @@ class Db():
         return os.path.isfile(os.path.join(self.path, "lock"))
 
     def open(self):
-        self.dbman.break_lock(self.path)
-        self.smgr.open_activate(self.path)
+        # self.dbman.break_lock(self.path)
+        return self.smgr.open_activate(self.path)
+
+    def close(self):
+        if self.dbstate.is_open():
+            return self.dbstate.db.close()
