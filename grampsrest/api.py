@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import reqparse,  Api, Resource
+from flask_caching import Cache
 import json
 from .db import Db
 from .gramps import get_people, get_translation, get_families
@@ -9,11 +10,11 @@ from .gramps import get_people, get_translation, get_families
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
-
+cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
+                           'CACHE_DIR': 'appcache'})
 
 parser = reqparse.RequestParser()
 parser.add_argument('strings', type=str)
-
 
 tree = Db('Straub')
 
@@ -30,16 +31,19 @@ def shutdown_session(exception=None):
 
 
 class People(Resource):
+    @cache.cached()
     def get(self):
         return get_people(tree)
 
 
 class Families(Resource):
+    @cache.cached()
     def get(self):
         return get_families(tree)
 
 
 class Translate(Resource):
+    @cache.cached()
     def get(self):
         args = parser.parse_args()
         try:
