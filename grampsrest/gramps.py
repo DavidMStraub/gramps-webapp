@@ -38,22 +38,34 @@ def get_deathplace(db, p):
     return get_event_place_from_handle(db, death_ref.ref)
 
 
-def get_event_date_from_handle(db, handle):
-    ev = db.get_event_from_handle(handle)
-    date = ev.get_date_object()
-    if  not date:
+def display_date(date):
+    if not date:
         return ''
     return dd.display(date)
 
 
-def get_event_place_from_handle(db, handle):
+def get_event_date_from_handle(db, handle):
     ev = db.get_event_from_handle(handle)
-    if not ev or not ev.place:
-        return ''
-    place = db.get_place_from_handle(ev.place)
+    date = ev.get_date_object()
+    return display_date(date)
+
+
+def display_place(db, place):
     if not place:
         return ''
     return place_displayer.display(db, place)
+
+
+def get_event_place_from_handle(db, handle):
+    ev = db.get_event_from_handle(handle)
+    return get_event_place(db, ev)
+
+
+def get_event_place(db, ev):
+    if not ev or not ev.place:
+        return ''
+    place = db.get_place_from_handle(ev.place)
+    return display_place(db, place)
 
 
 def get_marriageplace(db, f):
@@ -112,6 +124,20 @@ def get_children_id(db, f):
     return [db.get_person_from_handle(r.ref).gramps_id for r in refs]
 
 
+def get_parents_id(db, p):
+    ref =  p.get_main_parents_family_handle()
+    if not ref:
+        return ''
+    return db.get_family_from_handle(ref).gramps_id
+
+
+def get_families_id(db, p):
+    refs =  p.get_family_handle_list()
+    if not refs:
+        return []
+    return [db.get_family_from_handle(r).gramps_id for r in refs]
+
+
 def family_to_dict(db, f):
     return {
     'gramps_id': f.gramps_id,
@@ -122,6 +148,7 @@ def family_to_dict(db, f):
     'father_name': get_father_name(db, f),
     'mother_name': get_mother_name(db, f),
     'children': get_children_id(db, f),
+    'events': [r.ref for r in f.get_event_ref_list()],
     }
 
 
@@ -134,6 +161,20 @@ def person_to_dict(db, p):
     'deathdate': get_deathdate(db, p),
     'birthplace': get_birthplace(db, p),
     'deathplace': get_deathplace(db, p),
+    'parents': get_parents_id(db, p),
+    'families': get_families_id(db, p),
+    'events': [r.ref for r in p.get_event_ref_list()],
+    }
+
+
+def event_to_dict(db, e):
+    return {
+    'handle': e.handle,
+    'gramps_id': e.gramps_id,
+    'type': e.get_type().string,
+    'place': get_event_place(db, e),
+    'date': display_date(e.date),
+    'description': e.get_description(),
     }
 
 
@@ -145,6 +186,11 @@ def get_people(tree):
 def get_families(tree):
     db = tree.dbstate.db
     return {f.gramps_id: family_to_dict(db, f) for f in db.iter_families()}
+
+
+def get_events(tree):
+    db = tree.dbstate.db
+    return {e.handle: event_to_dict(db, e) for e in db.iter_events()}
 
 
 def get_translation(strings):
