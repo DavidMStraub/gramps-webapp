@@ -4,7 +4,7 @@ from flask_restful import reqparse,  Api, Resource
 from flask_caching import Cache
 import json
 from .db import Db
-from .gramps import get_people, get_translation, get_families, get_events
+from .gramps import get_people, get_translation, get_families, get_events, get_db_info
 
 
 app = Flask(__name__)
@@ -48,6 +48,12 @@ class Events(Resource):
         return get_events(tree)
 
 
+class DbInfo(Resource):
+    @cache.cached()
+    def get(self):
+        return get_db_info(tree)
+
+
 class Translate(Resource):
     @cache.cached()
     def get(self):
@@ -63,3 +69,4 @@ api.add_resource(People, '/people')
 api.add_resource(Families, '/families')
 api.add_resource(Events, '/events')
 api.add_resource(Translate, '/translate')
+api.add_resource(DbInfo, '/dbinfo')

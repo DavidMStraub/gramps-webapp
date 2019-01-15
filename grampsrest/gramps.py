@@ -178,6 +178,19 @@ def event_to_dict(db, e):
     }
 
 
+def get_db_info(tree):
+    db = tree.dbstate.db
+    return {
+    'name': db.get_dbname(),
+    'default_person': db.get_default_person().gramps_id,
+    'researcher': db.get_researcher().get_name(),
+    'number_people': db.get_number_of_people(),
+    'number_events': db.get_number_of_events(),
+    'number_families': db.get_number_of_families(),
+    'number_places': db.get_number_of_places(),
+    }
+
+
 def get_people(tree):
     db = tree.dbstate.db
     return {p.gramps_id: person_to_dict(db, p) for p in db.iter_people()}
