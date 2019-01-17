@@ -3,6 +3,9 @@ from gramps.gen.const import GRAMPS_LOCALE as locale
 from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.utils.db import get_marriage_or_fallback
+import os
+import io
+from PIL import Image
 
 
 nd = NameDisplay()
@@ -149,6 +152,7 @@ def family_to_dict(db, f):
     'mother_name': get_mother_name(db, f),
     'children': get_children_id(db, f),
     'events': [r.ref for r in f.get_event_ref_list()],
+    'media': [r.ref for r in f.get_media_list()],
     }
 
 
@@ -164,6 +168,7 @@ def person_to_dict(db, p):
     'parents': get_parents_id(db, p),
     'families': get_families_id(db, p),
     'events': [r.ref for r in p.get_event_ref_list()],
+    'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
     }
 
 
@@ -208,3 +213,33 @@ def get_events(tree):
 
 def get_translation(strings):
     return {s: _(s) for s in strings}
+
+
+def get_media_info(tree, handle):
+    db = tree.dbstate.db
+    m = db.get_media_from_handle(handle)
+    base_path = db.get_mediapath()
+    return {
+        'mime': m.mime,
+        'path': os.path.join(base_path, m.path),
+    }
+
+
+def get_thumbnail(path, size):
+    im = Image.open(path)
+    im.thumbnail((size, size))
+    f = io.BytesIO()
+    im.save(f, format='JPEG')
+    f.seek(0)
+    return f
+
+
+def get_thumbnail_cropped(path, size, x1, y1, x2, y2):
+    im = Image.open(path)
+    w, h = im.size
+    im = im.crop((x1 * w / 100, y1 * h / 100, x2 * w / 100, y2 * h / 100))
+    im.thumbnail((size, size))
+    f = io.BytesIO()
+    im.save(f, format='JPEG')
+    f.seek(0)
+    return f

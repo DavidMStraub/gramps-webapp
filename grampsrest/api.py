@@ -1,10 +1,11 @@
-from flask import Flask
+from flask import Flask, send_file
 from flask_cors import CORS
 from flask_restful import reqparse,  Api, Resource
 from flask_caching import Cache
 import json
 from .db import Db
-from .gramps import get_people, get_translation, get_families, get_events, get_db_info
+from .gramps import get_people, get_translation, get_families, get_events, \
+    get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped
 
 
 app = Flask(__name__)
@@ -70,3 +71,24 @@ api.add_resource(Families, '/families')
 api.add_resource(Events, '/events')
 api.add_resource(Translate, '/translate')
 api.add_resource(DbInfo, '/dbinfo')
+
+
+@app.route('/media/<string:handle>')
+def show_image(handle):
+    path = get_media_info(tree, handle)['path']
+    return send_file(path)
+
+
+@app.route('/thumbnail/<string:handle>/<int:size>')
+@cache.cached()
+def show_thumbnail(handle, size):
+    info = get_media_info(tree, handle)
+    tn = get_thumbnail(info['path'], size)
+    return send_file(tn, info['mime'])
+
+@app.route('/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
+@cache.cached()
+def show_thumbnail_cropped(handle, size, x1, y1, x2, y2):
+    info = get_media_info(tree, handle)
+    tn = get_thumbnail_cropped(info['path'], size, x1, y1, x2, y2)
+    return send_file(tn, info['mime'])
