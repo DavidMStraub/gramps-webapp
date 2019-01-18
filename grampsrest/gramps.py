@@ -5,7 +5,7 @@ from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.utils.db import get_marriage_or_fallback
 import os
 import io
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 nd = NameDisplay()
@@ -225,20 +225,27 @@ def get_media_info(tree, handle):
     }
 
 
-def get_thumbnail(path, size):
+def get_thumbnail(path, size, square=False):
     im = Image.open(path)
-    im.thumbnail((size, size))
+    if square:
+        im = ImageOps.fit(im, (size, size), bleed=0.0, centering=(0.0, 0.5), method=Image.BICUBIC)
+    else:
+        im.thumbnail((size, size))
     f = io.BytesIO()
     im.save(f, format='JPEG')
     f.seek(0)
     return f
 
 
-def get_thumbnail_cropped(path, size, x1, y1, x2, y2):
+def get_thumbnail_cropped(path, size, x1, y1, x2, y2, square=False):
     im = Image.open(path)
     w, h = im.size
     im = im.crop((x1 * w / 100, y1 * h / 100, x2 * w / 100, y2 * h / 100))
     im.thumbnail((size, size))
+    if square:
+        im = ImageOps.fit(im, (size, size), bleed=0.0, centering=(0.0, 0.5), method=Image.BICUBIC)
+    else:
+        im.thumbnail((size, size))
     f = io.BytesIO()
     im.save(f, format='JPEG')
     f.seek(0)

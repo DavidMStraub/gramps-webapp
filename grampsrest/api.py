@@ -7,7 +7,6 @@ from .db import Db
 from .gramps import get_people, get_translation, get_families, get_events, \
     get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped
 
-
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
@@ -80,15 +79,16 @@ def show_image(handle):
 
 
 @app.route('/thumbnail/<string:handle>/<int:size>')
-@cache.cached()
-def show_thumbnail(handle, size):
+# @cache.cached()
+def show_thumbnail_square(handle, size):
     info = get_media_info(tree, handle)
-    tn = get_thumbnail(info['path'], size)
+    tn = get_thumbnail(info['path'], size, square=True)
     return send_file(tn, info['mime'])
 
+
 @app.route('/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
-@cache.cached()
-def show_thumbnail_cropped(handle, size, x1, y1, x2, y2):
+# @cache.cached()
+def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
     info = get_media_info(tree, handle)
-    tn = get_thumbnail_cropped(info['path'], size, x1, y1, x2, y2)
+    tn = get_thumbnail_cropped(info['path'], size, x1, y1, x2, y2, square=True)
     return send_file(tn, info['mime'])
