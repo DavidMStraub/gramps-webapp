@@ -161,6 +161,7 @@ def person_to_dict(db, p):
     'gramps_id': p.gramps_id,
     'name_given': nd.display_given(p),
     'name_surname': p.primary_name.get_surname(),
+    'gender': p.gender,
     'birthdate': get_birthdate(db, p),
     'deathdate': get_deathdate(db, p),
     'birthplace': get_birthplace(db, p),
