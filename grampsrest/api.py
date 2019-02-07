@@ -1,7 +1,11 @@
-from flask import Flask, send_file
+from flask import Flask, jsonify, send_file, request
 from flask_cors import CORS
 from flask_restful import reqparse,  Api, Resource
 from flask_caching import Cache
+from flask_jwt_extended import  (
+    JWTManager, jwt_required, create_access_token,
+    get_jwt_identity
+)
 import json
 from .db import Db
 from .gramps import get_people, get_translation, get_families, get_events, \
@@ -12,6 +16,23 @@ CORS(app)
 api = Api(app)
 cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
                            'CACHE_DIR': 'appcache'})
+
+app.config['JWT_SECRET_KEY'] = 'AQ9WVXO6APDEO0A07USII6FWO8BCYZVGY5M1'
+jwt = JWTManager(app)
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+    password = request.json.get('password', None)
+    if not password:
+        return jsonify({"msg": "Missing password parameter"}), 400
+    if password != 'test':
+        return jsonify({"msg": "Wrong password"}), 401
+    access_token = create_access_token(identity='user')
+    return jsonify(access_token=access_token), 200
+
 
 parser = reqparse.RequestParser()
 parser.add_argument('strings', type=str)
@@ -28,6 +49,10 @@ def before_request():
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     tree.close(False)
+
+
+class ProtectedResource(Resource):
+    method_decorators = [jwt_required]
 
 
 class People(Resource):
@@ -48,8 +73,8 @@ class Events(Resource):
         return get_events(tree)
 
 
-class DbInfo(Resource):
-    @cache.cached()
+class DbInfo(ProtectedResource):
+    # @cache.cached()
     def get(self):
         return get_db_info(tree)
 
