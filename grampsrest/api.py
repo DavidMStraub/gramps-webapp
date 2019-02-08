@@ -6,12 +6,14 @@ from flask_jwt_extended import  (
     JWTManager, jwt_required, create_access_token,
 )
 import json
+import datetime
 from .db import Db
 from .gramps import get_people, get_translation, get_families, get_events, \
     get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped, \
     get_places
 
 app = Flask(__name__)
+app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app)
 api = Api(app)
 cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
@@ -19,6 +21,7 @@ cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
 
 app.config['JWT_SECRET_KEY'] = 'AQ9WVXO6APDEO0A07USII6FWO8BCYZVGY5M1'
 jwt = JWTManager(app)
+
 
 
 @app.route('/login', methods=['POST'])
@@ -30,7 +33,8 @@ def login():
         return jsonify({"msg": "Missing password parameter"}), 400
     if password != 'test':
         return jsonify({"msg": "Wrong password"}), 401
-    access_token = create_access_token(identity='user')
+    expires = datetime.timedelta(days=365)
+    access_token = create_access_token(identity='user', expires_delta=expires)
     return jsonify(access_token=access_token), 200
 
 
