@@ -4,12 +4,12 @@ from flask_restful import reqparse,  Api, Resource
 from flask_caching import Cache
 from flask_jwt_extended import  (
     JWTManager, jwt_required, create_access_token,
-    get_jwt_identity
 )
 import json
 from .db import Db
 from .gramps import get_people, get_translation, get_families, get_events, \
-    get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped
+    get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped, \
+    get_places
 
 app = Flask(__name__)
 CORS(app)
@@ -55,26 +55,32 @@ class ProtectedResource(Resource):
     method_decorators = [jwt_required]
 
 
-class People(Resource):
+class People(ProtectedResource):
     @cache.cached()
     def get(self):
         return get_people(tree)
 
 
-class Families(Resource):
+class Families(ProtectedResource):
     @cache.cached()
     def get(self):
         return get_families(tree)
 
 
-class Events(Resource):
+class Events(ProtectedResource):
     @cache.cached()
     def get(self):
         return get_events(tree)
 
 
+class Places(ProtectedResource):
+    @cache.cached()
+    def get(self):
+        return get_places(tree)
+
+
 class DbInfo(ProtectedResource):
-    # @cache.cached()
+    @cache.cached()
     def get(self):
         return get_db_info(tree)
 
@@ -93,6 +99,7 @@ class Translate(Resource):
 api.add_resource(People, '/people')
 api.add_resource(Families, '/families')
 api.add_resource(Events, '/events')
+api.add_resource(Places, '/places')
 api.add_resource(Translate, '/translate')
 api.add_resource(DbInfo, '/dbinfo')
 

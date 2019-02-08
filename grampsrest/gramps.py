@@ -173,6 +173,16 @@ def person_to_dict(db, p):
     }
 
 
+def place_to_dict(db, p):
+    return {
+    'name': p.name.value,
+    'gramps_id': p.gramps_id,
+    'type_string': p.place_type.string,
+    'type_value': p.place_type.value,
+    'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
+    }
+
+
 def event_to_dict(db, e):
     return {
     'handle': e.handle,
@@ -210,6 +220,10 @@ def get_families(tree):
 def get_events(tree):
     db = tree.dbstate.db
     return {e.handle: event_to_dict(db, e) for e in db.iter_events()}
+
+def get_places(tree):
+    db = tree.dbstate.db
+    return {p.handle: place_to_dict(db, p) for p in db.iter_places()}
 
 
 def get_translation(strings):
