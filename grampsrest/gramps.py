@@ -3,6 +3,7 @@ from gramps.gen.const import GRAMPS_LOCALE as locale
 from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.utils.db import get_marriage_or_fallback
+from gramps.gen.utils.location import get_main_location
 import os
 import io
 from PIL import Image, ImageOps
@@ -68,7 +69,7 @@ def get_event_place(db, ev):
     if not ev or not ev.place:
         return ''
     place = db.get_place_from_handle(ev.place)
-    return display_place(db, place)
+    return place.gramps_id
 
 
 def get_marriageplace(db, f):
@@ -141,6 +142,41 @@ def get_families_id(db, p):
     return [db.get_family_from_handle(r).gramps_id for r in refs]
 
 
+def get_event_participants(db, handle):
+    participant = {}
+    try:
+        result_list = list(db.find_backlink_handles(handle,
+                                 include_classes=['Person', 'Family']))
+    except:
+        return {}
+
+    people = set([x[1] for x in result_list if x[0] == 'Person'])
+    for personhandle in people:
+        person = db.get_person_from_handle(personhandle)
+        if not person:
+            continue
+        for event_ref in person.get_event_ref_list():
+            if handle == event_ref.ref:
+                role = event_ref.get_role().string
+                if role not in participant:
+                    participant[role] = []
+                participant[role].append({'type': 'Person', 'gramps_id': person.gramps_id})
+
+    families = set([x[1] for x in result_list if x[0] == 'Family'])
+    for familyhandle in families:
+        family = db.get_family_from_handle(familyhandle)
+        if not family:
+            continue
+        for event_ref in family.get_event_ref_list():
+            if handle == event_ref.ref:
+                role = event_ref.get_role().string
+                if role not in participant:
+                    participant[role] = []
+                participant[role].append({'type': 'Family', 'gramps_id': family.gramps_id})
+
+    return participant
+
+
 def family_to_dict(db, f):
     return {
     'gramps_id': f.gramps_id,
@@ -168,18 +204,20 @@ def person_to_dict(db, p):
     'deathplace': get_deathplace(db, p),
     'parents': get_parents_id(db, p),
     'families': get_families_id(db, p),
-    'events': [r.ref for r in p.get_event_ref_list()],
+    'events': [{'ref': r.ref, 'role': r.get_role().string} for r in p.get_event_ref_list()],
     'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
     }
 
 
 def place_to_dict(db, p):
     return {
+    'handle': p.handle,
     'name': p.name.value,
     'gramps_id': p.gramps_id,
     'type_string': p.place_type.string,
     'type_value': p.place_type.value,
     'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
+    'hierarchy': get_main_location(db, p)
     }
 
 
@@ -191,6 +229,8 @@ def event_to_dict(db, e):
     'place': get_event_place(db, e),
     'date': display_date(e.date),
     'description': e.get_description(),
+    'media': [{'ref': r.ref, 'rect': r.rect} for r in e.get_media_list()],
+    'participants': get_event_participants(db, e.handle),
     }
 
 
@@ -223,7 +263,7 @@ def get_events(tree):
 
 def get_places(tree):
     db = tree.dbstate.db
-    return {p.handle: place_to_dict(db, p) for p in db.iter_places()}
+    return {p.gramps_id: place_to_dict(db, p) for p in db.iter_places()}
 
 
 def get_translation(strings):
