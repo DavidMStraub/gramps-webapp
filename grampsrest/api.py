@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_file, request
+from flask import Flask, jsonify, send_file, request, send_from_directory
 from flask_cors import CORS
 from flask_restful import reqparse,  Api, Resource
 from flask_caching import Cache
@@ -12,17 +12,25 @@ from .gramps import get_people, get_translation, get_families, get_events, \
     get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped, \
     get_places
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='js')
 app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app)
 api = Api(app)
 cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
                            'CACHE_DIR': 'appcache'})
 
+app.config['JWT_TOKEN_LOCATION'] = ['headers', 'query_string']
 app.config['JWT_SECRET_KEY'] = 'AQ9WVXO6APDEO0A07USII6FWO8BCYZVGY5M1'
 jwt = JWTManager(app)
 
+@app.route('/')
+def send_index():
+    return send_from_directory(app.static_folder, 'index.html')
 
+
+@app.route('/<path:path>')
+def send_js(path):
+    return send_from_directory(app.static_folder, path)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -109,12 +117,14 @@ api.add_resource(DbInfo, '/dbinfo')
 
 
 @app.route('/media/<string:handle>')
+# @jwt_required
 def show_image(handle):
     path = get_media_info(tree, handle)['path']
     return send_file(path)
 
 
 @app.route('/thumbnail/<string:handle>/<int:size>')
+# @jwt_required
 # @cache.cached()
 def show_thumbnail_square(handle, size):
     info = get_media_info(tree, handle)
@@ -123,6 +133,7 @@ def show_thumbnail_square(handle, size):
 
 
 @app.route('/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
+# @jwt_required
 # @cache.cached()
 def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
     info = get_media_info(tree, handle)
