@@ -12,5 +12,10 @@ setup(name='grampsrest',
       long_description_content_type='text/markdown',
       license='MIT',
       packages=find_packages(),
-      install_requires=['flask', 'flask-restful'],
-      )
+      install_requires=['flask', 'flask-restful', 'flask-caching', 'flask-jwt-extended'],
+      entry_points={
+        'console_scripts': [
+            'grampsrest=grampsrest.api:cli'
+        ],
+      },
+)
