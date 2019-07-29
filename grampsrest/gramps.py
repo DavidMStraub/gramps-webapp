@@ -4,6 +4,7 @@ from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.utils.db import get_marriage_or_fallback
 from gramps.gen.utils.location import get_main_location
+from gramps.gen.utils.place import conv_lat_lon
 import os
 import io
 from PIL import Image, ImageOps
@@ -177,6 +178,13 @@ def get_event_participants(db, handle):
     return participant
 
 
+def geolocation(p):
+    lat, lon = p.get_latitude(), p.get_longitude()
+    if lat is None or lon is None:
+        return None
+    return conv_lat_lon(lat, lon)
+
+
 def family_to_dict(db, f):
     return {
     'gramps_id': f.gramps_id,
@@ -213,6 +221,7 @@ def place_to_dict(db, p):
     return {
     'handle': p.handle,
     'name': p.name.value,
+    'geolocation': geolocation(p),
     'gramps_id': p.gramps_id,
     'type_string': p.place_type.string,
     'type_value': p.place_type.value,
@@ -276,7 +285,9 @@ def get_media_info(tree, handle):
     base_path = db.get_mediapath()
     return {
         'mime': m.mime,
-        'path': os.path.join(base_path, m.path),
+        'path': m.path,
+        'full_path': os.path.join(base_path, m.path),
+
     }
 
 
