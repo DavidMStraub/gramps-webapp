@@ -131,15 +131,15 @@ def create_app():
 
 
     @app.route('/media/<string:handle>')
-    # @jwt_required
+    @jwt_required
     def show_image(handle):
         path = get_media_info(get_db(), handle)['full_path']
         return send_file(path)
 
 
     @app.route('/thumbnail/<string:handle>/<int:size>')
-    # @jwt_required
-    # @cache.cached()
+    @jwt_required
+    @cache.cached()
     def show_thumbnail_square(handle, size):
         info = get_media_info(get_db(), handle)
         tn = get_thumbnail(info['full_path'], size, square=True)
@@ -147,8 +147,8 @@ def create_app():
 
 
     @app.route('/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
-    # @jwt_required
-    # @cache.cached()
+    @jwt_required
+    @cache.cached()
     def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
         info = get_media_info(get_db(), handle)
         tn = get_thumbnail_cropped(info['full_path'], size, x1, y1, x2, y2, square=True)
