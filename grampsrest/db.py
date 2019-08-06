@@ -11,7 +11,7 @@ class Db():
         self.dbman = CLIDbManager(self.dbstate)
         self.user = User()
         self.smgr = CLIManager(self.dbstate, True, self.user)
-        self.path = self.dbman.get_family_tree_path('Straub')
+        self.path = self.dbman.get_family_tree_path(name)
 
     def is_locked(self):
         return os.path.isfile(os.path.join(self.path, "lock"))

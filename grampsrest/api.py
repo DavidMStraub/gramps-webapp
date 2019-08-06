@@ -33,7 +33,7 @@ def close_db(e=None):
 def create_app():
     app = Flask(__name__, static_folder='js')
     app.config['PROPAGATE_EXCEPTIONS'] = True
-    app.config['TREE'] = 'Straub'
+    app.config['TREE'] = os.environ.get('TREE')
     CORS(app)
     api = Api(app)
     cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
@@ -41,7 +41,7 @@ def create_app():
 
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'query_string']
 
-    jwt_secret_key = os.environ.get('JWT_SECRET_KEY', None)
+    jwt_secret_key = os.environ.get('JWT_SECRET_KEY')
     if jwt_secret_key is None:
         if os.path.exists('jwt_secret_key'):
             with open('jwt_secret_key', 'r') as f:
