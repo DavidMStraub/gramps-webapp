@@ -11,6 +11,7 @@ import datetime
 import click
 import secrets
 import os
+import logging
 from .db import Db
 from .gramps import get_people, get_translation, get_families, get_events, \
     get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped, \
@@ -34,6 +35,11 @@ def create_app():
     app = Flask(__name__, static_folder='js')
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['TREE'] = os.environ.get('TREE')
+    if app.config['TREE'] is None or app.config['TREE'] == '':
+        raise ValueError("You have to set the `TREE` environment variable.")
+
+    app.logger.setLevel(logging.INFO)
+    app.logger.info("Opening family tree '{}'".format(app.config['TREE']))
 
     # called once here in case Db's constructor raises
     Db(app.config['TREE'])
@@ -175,5 +181,7 @@ def create_app():
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
-def cli():
-    pass
+@click.option('-O', '--open', help='Family tree to use')
+def cli(open):
+    if open:
+        os.environ['TREE'] = open
