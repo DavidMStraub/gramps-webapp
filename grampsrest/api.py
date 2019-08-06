@@ -9,6 +9,8 @@ from flask_jwt_extended import  (
 import json
 import datetime
 import click
+import secrets
+import os
 from .db import Db
 from .gramps import get_people, get_translation, get_families, get_events, \
     get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped, \
@@ -38,7 +40,18 @@ def create_app():
                                'CACHE_DIR': 'appcache'})
 
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'query_string']
-    app.config['JWT_SECRET_KEY'] = 'AQ9WVXO6APDEO0A07USII6FWO8BCYZVGY5M1'
+
+    jwt_secret_key = os.environ.get('JWT_SECRET_KEY', None)
+    if jwt_secret_key is None:
+        if os.path.exists('jwt_secret_key'):
+            with open('jwt_secret_key', 'r') as f:
+                jwt_secret_key = f.read()
+        else:
+            jwt_secret_key = secrets.token_urlsafe(64)
+    with open('jwt_secret_key', 'w') as f:
+        f.write(jwt_secret_key)
+    app.config['JWT_SECRET_KEY'] = jwt_secret_key
+
     jwt = JWTManager(app)
 
     @app.route('/')
