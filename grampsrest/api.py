@@ -34,6 +34,10 @@ def create_app():
     app = Flask(__name__, static_folder='js')
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['TREE'] = os.environ.get('TREE')
+
+    # called once here in case Db's constructor raises
+    Db(app.config['TREE'])
+
     CORS(app)
     api = Api(app)
     cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
