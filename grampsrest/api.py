@@ -23,19 +23,21 @@ from .gramps import (get_db_info, get_events, get_families, get_media_info,
 
 
 def get_db():
+    """Get a new `Db` instance. Called before every request. Cached on first call."""
     if 'db' not in g:
         g.db = Db(current_app.config['TREE'])
     return g.db
 
 
 def close_db(e=None):
+    """Close the Database. Called after every request."""
     db = g.pop('db', None)
-
     if db is not None:
         db.close(False)
 
 
 def create_app():
+    """Flask application factory."""
     app = Flask(__name__, static_folder='js')
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['TREE'] = os.environ.get('TREE')
@@ -190,5 +192,6 @@ def create_app():
 @click.group(cls=FlaskGroup, create_app=create_app)
 @click.option('-O', '--open', help='Family tree to use')
 def cli(open):
+    """Custom CLI command."""
     if open:
         os.environ['TREE'] = open

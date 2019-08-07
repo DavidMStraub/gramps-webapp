@@ -16,7 +16,13 @@ ALLOWED_DB_BACKENDS = [
 
 
 class Db():
+    """Class for database handling."""
+
     def __init__(self, name):
+        """Initialize the database object for family tree `name`.
+
+        This will raise if the database backend is not `sqlite`.
+        The constructor does not open/lock the database yet."""
         self.dbstate = DbState()
         self.dbman = CLIDbManager(self.dbstate)
         self.user = User()
@@ -28,16 +34,23 @@ class Db():
                              .format(self.db_backend, name))
 
     def get_dbid(self):
+        """Get the database backend."""
         return get_dbid_from_path(self.path)
 
     def is_locked(self):
+        """Returns a boolean whether the database is locked."""
         return os.path.isfile(os.path.join(self.path, "lock"))
 
     def open(self, force=False):
+        """Open the database.
+
+        If `force` is `True`, will break an existing lock (use with care!).
+        """
         if force:
             self.dbman.break_lock(self.path)
         return self.smgr.open_activate(self.path)
 
     def close(self, *args, **kwargs):
+        """Close the database (if it is open)."""
         if self.dbstate.is_open():
             return self.dbstate.db.close(*args, **kwargs)

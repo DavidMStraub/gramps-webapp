@@ -19,6 +19,7 @@ _ = GRAMPS_LOCALE.translation.sgettext
 
 
 def get_birthplace(db, p):
+    """Return the name of the birth place."""
     birth_ref = p.get_birth_ref()
     if not birth_ref:
         return ''
@@ -26,6 +27,7 @@ def get_birthplace(db, p):
 
 
 def get_birthdate(db, p):
+    """Return the formatted birth date."""
     birth_ref = p.get_birth_ref()
     if not birth_ref:
         return ''
@@ -33,6 +35,7 @@ def get_birthdate(db, p):
 
 
 def get_deathdate(db, p):
+    """Return the formatted death date."""
     death_ref = p.get_death_ref()
     if not death_ref:
         return ''
@@ -40,6 +43,7 @@ def get_deathdate(db, p):
 
 
 def get_deathplace(db, p):
+    """Return the name of the death place."""
     death_ref = p.get_death_ref()
     if not death_ref:
         return ''
@@ -47,29 +51,34 @@ def get_deathplace(db, p):
 
 
 def display_date(date):
+    """Format the date object."""
     if not date:
         return ''
     return dd.display(date)
 
 
 def get_event_date_from_handle(db, handle):
+    """Return a formatted date for the event."""
     ev = db.get_event_from_handle(handle)
     date = ev.get_date_object()
     return display_date(date)
 
 
 def display_place(db, place):
+    """Return the formatted place name."""
     if not place:
         return ''
     return place_displayer.display(db, place)
 
 
 def get_event_place_from_handle(db, handle):
+    """Get the event's place."""
     ev = db.get_event_from_handle(handle)
     return get_event_place(db, ev)
 
 
 def get_event_place(db, ev):
+    """Get the event's place."""
     if not ev or not ev.place:
         return ''
     place = db.get_place_from_handle(ev.place)
@@ -77,6 +86,7 @@ def get_event_place(db, ev):
 
 
 def get_marriageplace(db, f):
+    """Get the marriage event's place."""
     ev = get_marriage_or_fallback(db, f)
     if not ev:
         return ''
@@ -84,6 +94,7 @@ def get_marriageplace(db, f):
 
 
 def get_marriagedate(db, f):
+    """Get the marriage event's date."""
     ev = get_marriage_or_fallback(db, f)
     if not ev:
         return ''
@@ -91,6 +102,7 @@ def get_marriagedate(db, f):
 
 
 def get_father_id(db, f):
+    """Get the Gramps ID of the family's father."""
     handle = f.father_handle
     if not handle:
         return ''
@@ -98,6 +110,7 @@ def get_father_id(db, f):
 
 
 def get_name_from_handle(db, handle):
+    """Get the name of the person."""
     p = db.get_person_from_handle(handle)
     sn = p.primary_name.get_surname()
     gn = nd.display_given(p)
@@ -105,6 +118,7 @@ def get_name_from_handle(db, handle):
 
 
 def get_father_name(db, f):
+    """Get the name of the family's father."""
     handle = f.father_handle
     if not handle:
         return ''
@@ -112,6 +126,7 @@ def get_father_name(db, f):
 
 
 def get_mother_id(db, f):
+    """Get the Gramps ID of the family's mother."""
     handle = f.mother_handle
     if not handle:
         return ''
@@ -119,6 +134,7 @@ def get_mother_id(db, f):
 
 
 def get_mother_name(db, f):
+    """Get the name of the family's mother."""
     handle = f.mother_handle
     if not handle:
         return ''
@@ -126,6 +142,7 @@ def get_mother_name(db, f):
 
 
 def get_children_id(db, f):
+    """Get the Gramps IDs of all the family's children."""
     refs = f.child_ref_list
     if not refs:
         return []
@@ -133,6 +150,7 @@ def get_children_id(db, f):
 
 
 def get_parents_id(db, p):
+    """Get the Gramps IDs of the family's parents."""
     ref = p.get_main_parents_family_handle()
     if not ref:
         return ''
@@ -140,6 +158,7 @@ def get_parents_id(db, p):
 
 
 def get_families_id(db, p):
+    """Get the Gramps IDs of all the person's families."""
     refs = p.get_family_handle_list()
     if not refs:
         return []
@@ -147,6 +166,8 @@ def get_families_id(db, p):
 
 
 def get_event_participants(db, handle):
+    """Get a list of dictionaries with the roles and Gramps IDs of all of the
+    event's participants, and whether they are a family or person."""
     participant = {}
     try:
         result_list = list(db.find_backlink_handles(handle,
@@ -182,6 +203,7 @@ def get_event_participants(db, handle):
 
 
 def geolocation(p):
+    """Get the latitude and longitude of a place."""
     lat, lon = p.get_latitude(), p.get_longitude()
     if lat is None or lon is None:
         return None
@@ -189,6 +211,7 @@ def geolocation(p):
 
 
 def family_to_dict(db, f):
+    """Return a dictionary with information about the family."""
     return {
     'gramps_id': f.gramps_id,
     'marriagedate': get_marriagedate(db, f),
@@ -204,6 +227,7 @@ def family_to_dict(db, f):
 
 
 def person_to_dict(db, p):
+    """Return a dictionary with information about the person."""
     return {
     'gramps_id': p.gramps_id,
     'name_given': nd.display_given(p),
@@ -221,6 +245,7 @@ def person_to_dict(db, p):
 
 
 def place_to_dict(db, p):
+    """Return a dictionary with information about the place."""
     return {
     'handle': p.handle,
     'name': p.name.value,
@@ -234,6 +259,7 @@ def place_to_dict(db, p):
 
 
 def event_to_dict(db, e):
+    """Return a dictionary with information about the event."""
     return {
     'handle': e.handle,
     'gramps_id': e.gramps_id,
@@ -247,6 +273,7 @@ def event_to_dict(db, e):
 
 
 def get_db_info(tree):
+    """Return a dictionary with information about the database."""
     db = tree.dbstate.db
     return {
     'name': db.get_dbname(),
@@ -260,29 +287,35 @@ def get_db_info(tree):
 
 
 def get_people(tree):
+    """Return a nested dictionary with information about all the people."""
     db = tree.dbstate.db
     return {p.gramps_id: person_to_dict(db, p) for p in db.iter_people()}
 
 
 def get_families(tree):
+    """Return a nested dictionary with information about all the families."""
     db = tree.dbstate.db
     return {f.gramps_id: family_to_dict(db, f) for f in db.iter_families()}
 
 
 def get_events(tree):
+    """Return a nested dictionary with information about all the events."""
     db = tree.dbstate.db
     return {e.handle: event_to_dict(db, e) for e in db.iter_events()}
 
 def get_places(tree):
+    """Return a nested dictionary with information about all the places."""
     db = tree.dbstate.db
     return {p.gramps_id: place_to_dict(db, p) for p in db.iter_places()}
 
 
 def get_translation(strings):
+    """Return the translation of all the given strings for the current locale."""
     return {s: _(s) for s in strings}
 
 
 def get_media_info(tree, handle):
+    """Return a dictionary with information about the media object."""
     db = tree.dbstate.db
     m = db.get_media_from_handle(handle)
     base_path = db.get_mediapath()
