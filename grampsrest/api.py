@@ -1,21 +1,25 @@
-from flask import Flask, jsonify, send_file, request, send_from_directory, current_app, g
-from flask.cli import with_appcontext, FlaskGroup
-from flask_cors import CORS
-from flask_restful import reqparse,  Api, Resource
-from flask_caching import Cache
-from flask_jwt_extended import  (
-    JWTManager, jwt_required, create_access_token,
-)
-import json
+"""Flask web app providing a REST API to a gramps family tree."""
+
+
 import datetime
-import click
-import secrets
-import os
+import json
 import logging
+import os
+import secrets
+
+import click
+from flask import (Flask, current_app, g, jsonify, request, send_file,
+                   send_from_directory)
+from flask.cli import FlaskGroup
+from flask_caching import Cache
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_restful import Api, Resource, reqparse
+
 from .db import Db
-from .gramps import get_people, get_translation, get_families, get_events, \
-    get_db_info, get_media_info, get_thumbnail, get_thumbnail_cropped, \
-    get_places
+from .gramps import (get_db_info, get_events, get_families, get_media_info,
+                     get_people, get_places, get_thumbnail,
+                     get_thumbnail_cropped, get_translation)
 
 
 def get_db():

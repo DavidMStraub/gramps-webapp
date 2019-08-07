@@ -1,18 +1,21 @@
+"""Functions using the Gramps Python package to access the family tree."""
+
+
+import io
+import os
+
+from gramps.gen.const import GRAMPS_LOCALE
 from gramps.gen.display.name import NameDisplay
-from gramps.gen.const import GRAMPS_LOCALE as locale
 from gramps.gen.display.place import displayer as place_displayer
-from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.utils.db import get_marriage_or_fallback
 from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
-import os
-import io
 from PIL import Image, ImageOps
 
 
 nd = NameDisplay()
-dd = locale.date_displayer
-_ = glocale.translation.sgettext
+dd = GRAMPS_LOCALE.date_displayer
+_ = GRAMPS_LOCALE.translation.sgettext
 
 
 def get_birthplace(db, p):
@@ -130,14 +133,14 @@ def get_children_id(db, f):
 
 
 def get_parents_id(db, p):
-    ref =  p.get_main_parents_family_handle()
+    ref = p.get_main_parents_family_handle()
     if not ref:
         return ''
     return db.get_family_from_handle(ref).gramps_id
 
 
 def get_families_id(db, p):
-    refs =  p.get_family_handle_list()
+    refs = p.get_family_handle_list()
     if not refs:
         return []
     return [db.get_family_from_handle(r).gramps_id for r in refs]

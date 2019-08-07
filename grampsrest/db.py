@@ -1,10 +1,13 @@
-from gramps.gen.dbstate import DbState
-from gramps.gen.db.utils import get_dbid_from_path
+"""Functions for database access."""
+
+
+import os
+
 from gramps.cli.clidbman import CLIDbManager
 from gramps.cli.grampscli import CLIManager
 from gramps.cli.user import User
-from gramps.plugins.db.dbapi.dbapi import DBAPI
-import os
+from gramps.gen.db.utils import get_dbid_from_path
+from gramps.gen.dbstate import DbState
 
 
 ALLOWED_DB_BACKENDS = [
