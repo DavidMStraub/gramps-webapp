@@ -1,7 +1,6 @@
 """Functions using the Gramps Python package to access the family tree."""
 
 
-import io
 import os
 
 from gramps.gen.const import GRAMPS_LOCALE
@@ -10,7 +9,6 @@ from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.utils.db import get_marriage_or_fallback
 from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
-from PIL import Image, ImageOps
 
 
 nd = NameDisplay()
@@ -325,30 +323,3 @@ def get_media_info(tree, handle):
         'full_path': os.path.join(base_path, m.path),
 
     }
-
-
-def get_thumbnail(path, size, square=False):
-    im = Image.open(path)
-    if square:
-        im = ImageOps.fit(im, (size, size), bleed=0.0, centering=(0.0, 0.5), method=Image.BICUBIC)
-    else:
-        im.thumbnail((size, size))
-    f = io.BytesIO()
-    im.save(f, format='JPEG')
-    f.seek(0)
-    return f
-
-
-def get_thumbnail_cropped(path, size, x1, y1, x2, y2, square=False):
-    im = Image.open(path)
-    w, h = im.size
-    im = im.crop((x1 * w / 100, y1 * h / 100, x2 * w / 100, y2 * h / 100))
-    im.thumbnail((size, size))
-    if square:
-        im = ImageOps.fit(im, (size, size), bleed=0.0, centering=(0.0, 0.5), method=Image.BICUBIC)
-    else:
-        im.thumbnail((size, size))
-    f = io.BytesIO()
-    im.save(f, format='JPEG')
-    f.seek(0)
-    return f

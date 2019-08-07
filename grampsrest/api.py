@@ -18,8 +18,8 @@ from flask_restful import Api, Resource, reqparse
 
 from .db import Db
 from .gramps import (get_db_info, get_events, get_families, get_media_info,
-                     get_people, get_places, get_thumbnail,
-                     get_thumbnail_cropped, get_translation)
+                     get_people, get_places, get_translation)
+from .image import get_thumbnail, get_thumbnail_cropped
 
 
 def get_db():
