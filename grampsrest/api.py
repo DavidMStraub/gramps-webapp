@@ -70,19 +70,14 @@ def create_app():
 
     jwt = JWTManager(app)
 
-    @app.route('/')
-    def send_index():
-        return send_from_directory(app.static_folder, 'index.html')
-
-
     @app.route('/<path:path>')
     def send_js(path):
-        if os.path.exists(os.path.join(app.static_folder, path)):
+        if path and os.path.exists(os.path.join(app.static_folder, path)):
             return send_from_directory(app.static_folder, path)
         else:
             return send_from_directory(app.static_folder, 'index.html')
 
-    @app.route('/login', methods=['POST'])
+    @app.route('/api/login', methods=['POST'])
     def login():
         if not request.is_json:
             return jsonify({"msg": "Missing JSON in request"}), 400
@@ -154,22 +149,22 @@ def create_app():
             return {"data": get_translation(strings)}
 
 
-    api.add_resource(People, '/people')
-    api.add_resource(Families, '/families')
-    api.add_resource(Events, '/events')
-    api.add_resource(Places, '/places')
-    api.add_resource(Translate, '/translate')
-    api.add_resource(DbInfo, '/dbinfo')
+    api.add_resource(People, '/api/people')
+    api.add_resource(Families, '/api/families')
+    api.add_resource(Events, '/api/events')
+    api.add_resource(Places, '/api/places')
+    api.add_resource(Translate, '/api/translate')
+    api.add_resource(DbInfo, '/api/dbinfo')
 
 
-    @app.route('/media/<string:handle>')
+    @app.route('/api/media/<string:handle>')
     @jwt_required
     def show_image(handle):
         path = get_media_info(get_db(), handle)['full_path']
         return send_file(path)
 
 
-    @app.route('/thumbnail/<string:handle>/<int:size>')
+    @app.route('/api/thumbnail/<string:handle>/<int:size>')
     @jwt_required
     @cache.cached()
     def show_thumbnail_square(handle, size):
@@ -178,7 +173,7 @@ def create_app():
         return send_file(tn, info['mime'])
 
 
-    @app.route('/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
+    @app.route('/api/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
     @jwt_required
     @cache.cached()
     def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
