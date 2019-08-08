@@ -138,6 +138,17 @@ def create_app():
             return get_db_info(get_db())
 
 
+    class FullTree(ProtectedResource):
+        @cache.cached()
+        def get(self):
+            return {
+                'people': get_people(get_db()),
+                'families': get_families(get_db()),
+                'events': get_events(get_db()),
+                'places': get_places(get_db()),
+                'dbinfo': get_db_info(get_db()),
+            } 
+
     class Translate(Resource):
         @cache.cached()
         def get(self):
@@ -155,6 +166,7 @@ def create_app():
     api.add_resource(Places, '/api/places')
     api.add_resource(Translate, '/api/translate')
     api.add_resource(DbInfo, '/api/dbinfo')
+    api.add_resource(FullTree, '/api/tree')
 
 
     @app.route('/api/media/<string:handle>')
