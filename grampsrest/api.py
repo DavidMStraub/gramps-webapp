@@ -43,6 +43,9 @@ def create_app():
     app.config['TREE'] = os.environ.get('TREE')
     if app.config['TREE'] is None or app.config['TREE'] == '':
         raise ValueError("You have to set the `TREE` environment variable.")
+    app.config['PASSWORD'] = os.environ.get('PASSWORD') or ''
+    if not app.config['PASSWORD']:
+        logging.warn("The password is empty! The app will not be protected.")
 
     app.logger.setLevel(logging.INFO)
     app.logger.info("Opening family tree '{}'".format(app.config['TREE']))
@@ -82,9 +85,7 @@ def create_app():
         if not request.is_json:
             return jsonify({"msg": "Missing JSON in request"}), 400
         password = request.json.get('password', None)
-        if not password:
-            return jsonify({"msg": "Missing password parameter"}), 400
-        if password != 'test':
+        if password != app.config['PASSWORD']:
             return jsonify({"msg": "Wrong password"}), 401
         expires = datetime.timedelta(days=365)
         access_token = create_access_token(identity='user', expires_delta=expires)
