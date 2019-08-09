@@ -7,6 +7,7 @@ from gramps.gen.const import GRAMPS_LOCALE
 from gramps.gen.display.name import NameDisplay
 from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.utils.db import get_marriage_or_fallback
+from gramps.gen.utils.file import expand_media_path
 from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
 
@@ -316,7 +317,7 @@ def get_media_info(tree, handle):
     """Return a dictionary with information about the media object."""
     db = tree.dbstate.db
     m = db.get_media_from_handle(handle)
-    base_path = db.get_mediapath()
+    base_path = expand_media_path(db.get_mediapath(), db)
     return {
         'mime': m.mime,
         'path': m.path,
