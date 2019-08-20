@@ -28,6 +28,10 @@ class Db():
         self.user = User()
         self.smgr = CLIManager(self.dbstate, True, self.user)
         self.path = self.dbman.get_family_tree_path(name)
+        if not self.path:
+            from gramps.gen.config import config
+            raise ValueError("Family tree {} not found. Known trees: {}"
+                             .format(name, self.dbman.family_tree_list()))
         self.db_backend = self.get_dbid()
         if self.db_backend not in ALLOWED_DB_BACKENDS:
             raise ValueError("Database backend '{}' of tree '{}' not supported."
