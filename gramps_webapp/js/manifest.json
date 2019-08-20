@@ -1,0 +1,21 @@
+{
+  "name": "Gramps Web App",
+  "short_name": "Gramps",
+  "description": "Progressive web app for genealogical research, based on the Gramps project",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#5D4037",
+  "background_color": "#5D4037",
+  "icons": [
+    {
+      "src": "images/manifest/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/manifest/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
