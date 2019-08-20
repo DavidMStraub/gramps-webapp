@@ -73,6 +73,10 @@ def create_app():
 
     jwt = JWTManager(app)
 
+    @app.route('/')
+    def send_js_index():
+        return send_from_directory(app.static_folder, 'index.html')
+
     @app.route('/<path:path>')
     def send_js(path):
         if path and os.path.exists(os.path.join(app.static_folder, path)):
