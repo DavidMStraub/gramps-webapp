@@ -27,3 +27,29 @@ The project is still in an early stage. Please use the issue system to report pr
 - Galleries with full-size previews and linked person tags
 - Most of the family tree data are cached in the browser, making the app fast after the initial loading
 
+## Installation
+
+At present, the simplest method to install the latest version of the package directly from the repository is
+
+```python
+python3 -m pip install --user git+https://github.com/DavidMStraub/gramps-webapp.git --upgrade
+```
+
+## Running locally
+
+You can try out the web app locally with an existing Gramps database.
+
+**:warning: This is experimental software. Back up your data before trying this! :warning:**
+
+It will only work with SQLite databases (not with BSDDB).
+After installation, run
+
+```
+gramps_webapp -O 'My family tree' run --without-threads
+```
+
+You can find the names of the existing databases and their backends with `gramps -L`.
+
+## Deploying to the web
+
+Instructions will follow.
