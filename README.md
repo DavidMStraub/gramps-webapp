@@ -7,7 +7,7 @@ way of browsing your records on your local computer.
 
 ## Demo
 
-There is a [demo instance](https://agile-bayou-66821.herokuapp.com) using Gramps's example family tree database.
+There is a [demo instance](https://agile-bayou-66821.herokuapp.com) using Gramps's example family tree database. Use the password "test".
 
 ## Disclaimers
 
@@ -53,6 +53,8 @@ gramps_webapp -O 'My family tree' run --without-threads
 ```
 
 You can find the names of the existing databases and their backends with `gramps -L`.
+
+(NB: single-threaded running is currently necessary because of Gramps's restrictive database locking.)
 
 ## Deploying to the web
 
