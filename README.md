@@ -5,6 +5,10 @@ the [Gramps](https://gramps-project.org) software. It allows to share
 your genalogical research with family members or provides an alternative
 way of browsing your records on your local computer.
 
+## Demo
+
+There is a [demo instance](https://agile-bayou-66821.herokuapp.com) using Gramps's example family tree database.
+
 ## Disclaimers
 
 **:warning: This is experimental software. Back up your data before using this on your own database! :warning:**
