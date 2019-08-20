@@ -253,7 +253,7 @@ resolved=(location.origin||location.protocol+"//"+location.host)+resolved}return
         font-weight: 500;
       }
       section.cards {
-        column-count: 3;
+        column-width: 300px;
         column-gap: 15px;
       }
       </style>
