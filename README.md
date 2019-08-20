@@ -35,7 +35,7 @@ The project is still in an early stage. Please use the issue system to report pr
 
 At present, the simplest method to install the latest version of the package directly from the repository is
 
-```python
+```
 python3 -m pip install --user git+https://github.com/DavidMStraub/gramps-webapp.git --upgrade
 ```
 
