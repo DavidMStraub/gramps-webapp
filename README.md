@@ -30,6 +30,7 @@ The project is still in an early stage. Please use the issue system to report pr
 - Ancestor tree view
 - Galleries with full-size previews and linked person tags
 - Most of the family tree data are cached in the browser, making the app fast after the initial loading
+- Fully internationalized UI (directly using Gramps's translation strings)
 
 ## Installation
 
