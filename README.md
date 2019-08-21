@@ -59,3 +59,14 @@ You can find the names of the existing databases and their backends with `gramps
 ## Deploying to the web
 
 Instructions will follow.
+
+## Current limitations
+
+- No user management
+- Tokens have infinite lifetime (refresh tokens would be more secure)
+- No display of sources, repositories, and notes
+- Private records not respected
+- Read-only (no family tree editing)
+- ...
+
+Please use the [issue system](https://github.com/DavidMStraub/gramps-webapp/issues) to report bugs or make feature requests.
