@@ -271,6 +271,31 @@ def event_to_dict(db, e):
     }
 
 
+def citation_to_dict(db, c):
+    """Return a dictionary with information about the citation."""
+    return {
+    'source': db.get_source_from_handle(c.get_reference_handle()).gramps_id,
+    'media': [{'ref': r.ref, 'rect': r.rect} for r in c.get_media_list()],
+    }
+
+
+def source_to_dict(db, s):
+    """Return a dictionary with information about the source."""
+    return {
+    'title': s.get_title(),
+    'media': [{'ref': r.ref, 'rect': r.rect} for r in s.get_media_list()],
+    'repositories': [db.get_repository_from_handle(r.ref).gramps_id for r in s.get_reporef_list()],
+    }
+
+
+def repository_to_dict(db, r):
+    """Return a dictionary with information about the repository."""
+    return {
+    'title': r.name,
+    'type': r.get_type().string,
+    }
+
+
 def get_db_info(tree):
     """Return a dictionary with information about the database."""
     db = tree.dbstate.db
@@ -306,6 +331,24 @@ def get_places(tree):
     """Return a nested dictionary with information about all the places."""
     db = tree.dbstate.db
     return {p.gramps_id: place_to_dict(db, p) for p in db.iter_places()}
+
+
+def get_citations(tree):
+    """Return a nested dictionary with information about all the citations."""
+    db = tree.dbstate.db
+    return {c.gramps_id: citation_to_dict(db, c) for c in db.iter_citations()}
+
+
+def get_sources(tree):
+    """Return a nested dictionary with information about all the sources."""
+    db = tree.dbstate.db
+    return {s.gramps_id: source_to_dict(db, s) for s in db.iter_sources()}
+
+
+def get_repositories(tree):
+    """Return a nested dictionary with information about all the repositories."""
+    db = tree.dbstate.db
+    return {r.gramps_id: repository_to_dict(db, r) for r in db.iter_repositories()}
 
 
 def get_translation(strings):

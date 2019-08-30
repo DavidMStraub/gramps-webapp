@@ -18,7 +18,8 @@ from flask_restful import Api, Resource, reqparse
 
 from .db import Db
 from .gramps import (get_db_info, get_events, get_families, get_media_info,
-                     get_people, get_places, get_translation)
+                     get_people, get_places, get_translation,
+                     get_citations, get_sources, get_repositories)
 from .image import get_thumbnail, get_thumbnail_cropped
 
 
@@ -136,6 +137,21 @@ def create_app():
         def get(self):
             return get_places(get_db())
 
+    class Citations(ProtectedResource):
+        @cache.cached()
+        def get(self):
+            return get_citations(get_db())
+
+    class Sources(ProtectedResource):
+        @cache.cached()
+        def get(self):
+            return get_sources(get_db())
+
+    class Repositories(ProtectedResource):
+        @cache.cached()
+        def get(self):
+            return get_repositories(get_db())
+
 
     class DbInfo(ProtectedResource):
         @cache.cached()
@@ -151,6 +167,9 @@ def create_app():
                 'families': get_families(get_db()),
                 'events': get_events(get_db()),
                 'places': get_places(get_db()),
+                'citations': get_citations(get_db()),
+                'sources': get_sources(get_db()),
+                'repositories': get_repositories(get_db()),
                 'dbinfo': get_db_info(get_db()),
             } 
 
@@ -169,6 +188,9 @@ def create_app():
     api.add_resource(Families, '/api/families')
     api.add_resource(Events, '/api/events')
     api.add_resource(Places, '/api/places')
+    api.add_resource(Citations, '/api/citations')
+    api.add_resource(Sources, '/api/sources')
+    api.add_resource(Repositories, '/api/repositories')
     api.add_resource(Translate, '/api/translate')
     api.add_resource(DbInfo, '/api/dbinfo')
     api.add_resource(FullTree, '/api/tree')
