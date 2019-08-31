@@ -276,6 +276,8 @@ def citation_to_dict(db, c):
     return {
     'source': db.get_source_from_handle(c.get_reference_handle()).gramps_id,
     'media': [{'ref': r.ref, 'rect': r.rect} for r in c.get_media_list()],
+    'date': dd.display(c.date),
+    'page': c.page
     }
 
 
