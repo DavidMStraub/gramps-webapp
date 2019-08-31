@@ -287,6 +287,8 @@ def source_to_dict(db, s):
     'title': s.get_title(),
     'media': [{'ref': r.ref, 'rect': r.rect} for r in s.get_media_list()],
     'repositories': [db.get_repository_from_handle(r.ref).gramps_id for r in s.get_reporef_list()],
+    'author': s.author,
+    'pubinfo': s.pubinfo,
     }
 
 
