@@ -12,7 +12,7 @@ import{html$2 as html,PageViewElement,SharedStyles,connect,translate,store}from"
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="date" direction="desc">${translate("Date")}</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="date_sortval" direction="desc">${translate("Date")}</vaadin-grid-sorter>
               <br>
               <vaadin-grid-filter path="date"></vaadin-grid-filter>
             </template>
@@ -30,13 +30,13 @@ import{html$2 as html,PageViewElement,SharedStyles,connect,translate,store}from"
           </vaadin-grid-column>
           <vaadin-grid-column>
             <template class="header">
-              <vaadin-grid-sorter path="place_name">${translate("Place")}</vaadin-grid-sorter>
+              <vaadin-grid-sorter path="primary_participants">${translate("Participants")}</vaadin-grid-sorter>
               <br>
-              <vaadin-grid-filter path="place_name"></vaadin-grid-filter>
+              <vaadin-grid-filter path="primary_participants"></vaadin-grid-filter>
             </template>
             <template>
-              <a href="/place/[[item.place]]"><div>[[item.place_name]]</div></a>
+              [[item.primary_participants]]
             </template>
           </vaadin-grid-column>
         </vaadin-grid>
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._hidden=!1}static get properties(){return{_events:{type:Object},_hidden:{type:Boolean}}}_get_place_name(state,event){if(event.place!=void 0&&""!=event.place){event.place_name=state.api.places[event.place].name};return event}stateChanged(state){this._events=Object.values(state.api.events).map(e=>this._get_place_name(state,e));this._hidden=!store.getState().app.wideLayout}firstUpdated(){}}window.customElements.define("gr-view-events",MyViewEvents);
+    `}static get styles(){return[SharedStyles]}constructor(){super();this._hidden=!1}static get properties(){return{_events:{type:Object},_hidden:{type:Boolean}}}_get_event_participants(state,event){if(event.participants!=void 0&&event.participants[translate("Primary")]!=void 0){var p_people=event.participants[translate("Primary")].map(function(p,index){if("Person"==p.type){return state.api.people[p.gramps_id].name_given+" "+state.api.people[p.gramps_id].name_surname}}).join(", ")}else{var p_people=""}if(event.participants!=void 0&&event.participants[translate("Family")]!=void 0){var p_families=event.participants[translate("Family")].map(function(p,index){if("Family"==p.type){return state.api.families[p.gramps_id].father_name+", "+state.api.families[p.gramps_id].mother_name}}).join(", ")}else{var p_families=""}event.primary_participants=p_people+p_families;return event}stateChanged(state){this._events=Object.values(state.api.events).map(e=>this._get_event_participants(state,e));this._hidden=!store.getState().app.wideLayout}firstUpdated(){}}window.customElements.define("gr-view-events",MyViewEvents);

@@ -20115,6 +20115,10 @@ if(!this._token){return html$1`
         --app-drawer-selected-color: var(--app-light-text-color);
       }
 
+      .app-drawer-content {
+        background-color: var(--app-drawer-background-color);
+      }
+
       app-header {
         position: fixed;
         top: 0;
@@ -20267,23 +20271,25 @@ if(!this._token){return html$1`
     <!-- Drawer content -->
     <app-drawer .opened="${this._drawerOpened}" .persistent="${this._wideLayout}"
         @opened-changed="${this._drawerOpenedChanged}" style="z-index:9999;">
-      <nav class="drawer-list">
-        <a ?selected="${"dashboard"===this._page}" href="/dashboard">${homeIcon} ${translate$1("Home Page")}</a>
-        <hr>
-        <a ?selected="${"people"===this._page}" href="/people">${accountIcon} ${translate$1("People")}</a>
-        <a ?selected="${"families"===this._page}" href="/families">${familyIcon} ${translate$1("Families")}</a>
-        <a ?selected="${"events"===this._page}" href="/events">${calendarIcon} ${translate$1("Events")}</a>
-        <a ?selected="${"sources"===this._page}" href="/sources">${bookIcon} ${translate$1("Sources")}</a>
-        <a ?selected="${"places"===this._page}" href="/places">${placeIcon} ${translate$1("Places")}</a>
-        <a ?selected="${"map"===this._page}" href="/map">${mapIcon} ${translate$1("Map")}</a>
-        <hr>
-        <span class="activePerson"><span class="link" @click="${this._setMainPersonActive}">${homeAccountIcon}</span> ${this._activePerson?this._activePerson.name_surname+",":""}
-        ${this._activePerson?this._activePerson.name_given:""}</span>
-        <a ?selected="${"person"===this._page}" href="/person/${this._activePerson.gramps_id}">${personDetailIcon} ${translate$1("Details")}</a>
-        <a ?selected="${"tree"===this._page}" href="/tree">${pedigreeIcon} ${translate$1("Family Tree")}</a>
-        <hr>
-        <span class="button link" @click="${this._logout}">${logoutIcon}</span>
-      </nav>
+      <div class="app-drawer-content" style="height: 100%; overflow: auto;">
+        <nav class="drawer-list">
+          <a ?selected="${"dashboard"===this._page}" href="/dashboard">${homeIcon} ${translate$1("Home Page")}</a>
+          <hr>
+          <a ?selected="${"people"===this._page}" href="/people">${accountIcon} ${translate$1("People")}</a>
+          <a ?selected="${"families"===this._page}" href="/families">${familyIcon} ${translate$1("Families")}</a>
+          <a ?selected="${"events"===this._page}" href="/events">${calendarIcon} ${translate$1("Events")}</a>
+          <a ?selected="${"sources"===this._page}" href="/sources">${bookIcon} ${translate$1("Sources")}</a>
+          <a ?selected="${"places"===this._page}" href="/places">${placeIcon} ${translate$1("Places")}</a>
+          <a ?selected="${"map"===this._page}" href="/map">${mapIcon} ${translate$1("Map")}</a>
+          <hr>
+          <span class="activePerson"><span class="link" @click="${this._setMainPersonActive}">${homeAccountIcon}</span> ${this._activePerson?this._activePerson.name_surname+",":""}
+          ${this._activePerson?this._activePerson.name_given:""}</span>
+          <a ?selected="${"person"===this._page}" href="/person/${this._activePerson.gramps_id}">${personDetailIcon} ${translate$1("Details")}</a>
+          <a ?selected="${"tree"===this._page}" href="/tree">${pedigreeIcon} ${translate$1("Family Tree")}</a>
+          <hr>
+          <span class="button link" @click="${this._logout}">${logoutIcon}</span>
+        </nav>
+      </div>
     </app-drawer>
 
     <!-- Main content -->
