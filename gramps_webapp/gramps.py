@@ -274,6 +274,7 @@ def event_to_dict(db, e):
 def citation_to_dict(db, c):
     """Return a dictionary with information about the citation."""
     return {
+    'gramps_id': c.gramps_id,
     'source': db.get_source_from_handle(c.get_reference_handle()).gramps_id,
     'media': [{'ref': r.ref, 'rect': r.rect} for r in c.get_media_list()],
     'date': dd.display(c.date),
@@ -284,6 +285,7 @@ def citation_to_dict(db, c):
 def source_to_dict(db, s):
     """Return a dictionary with information about the source."""
     return {
+    'gramps_id': s.gramps_id,
     'title': s.get_title(),
     'media': [{'ref': r.ref, 'rect': r.rect} for r in s.get_media_list()],
     'repositories': [db.get_repository_from_handle(r.ref).gramps_id for r in s.get_reporef_list()],
@@ -295,6 +297,7 @@ def source_to_dict(db, s):
 def repository_to_dict(db, r):
     """Return a dictionary with information about the repository."""
     return {
+    'gramps_id': r.gramps_id,
     'title': r.name,
     'type': r.get_type().string,
     }
