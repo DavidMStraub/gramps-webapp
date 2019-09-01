@@ -209,6 +209,12 @@ def geolocation(p):
     return conv_lat_lon(lat, lon)
 
 
+def get_citation_ids(db, x):
+    """Get the Gramps IDs of direct citations of object x
+    (e.g. person, event, family, place)"""
+    return [db.get_citation_from_handle(h).gramps_id for h in x.get_citation_list()]
+
+
 def family_to_dict(db, f):
     """Return a dictionary with information about the family."""
     return {
@@ -222,6 +228,7 @@ def family_to_dict(db, f):
     'children': get_children_id(db, f),
     'events': [r.ref for r in f.get_event_ref_list()],
     'media': [r.ref for r in f.get_media_list()],
+    'citations': get_citation_ids(db, f),
     }
 
 
@@ -240,6 +247,7 @@ def person_to_dict(db, p):
     'families': get_families_id(db, p),
     'events': [{'ref': r.ref, 'role': r.get_role().string} for r in p.get_event_ref_list()],
     'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
+    'citations': get_citation_ids(db, p),
     }
 
 
@@ -253,7 +261,8 @@ def place_to_dict(db, p):
     'type_string': p.place_type.string,
     'type_value': p.place_type.value,
     'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
-    'hierarchy': get_main_location(db, p)
+    'hierarchy': get_main_location(db, p),
+    'citations': get_citation_ids(db, p),
     }
 
 
@@ -269,6 +278,7 @@ def event_to_dict(db, e):
     'description': e.get_description(),
     'media': [{'ref': r.ref, 'rect': r.rect} for r in e.get_media_list()],
     'participants': get_event_participants(db, e.handle),
+    'citations': get_citation_ids(db, e),
     }
 
 
