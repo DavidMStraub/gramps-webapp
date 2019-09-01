@@ -265,6 +265,7 @@ def event_to_dict(db, e):
     'type': e.get_type().string,
     'place': get_event_place(db, e),
     'date': display_date(e.date),
+    'date_sortval': e.date.get_sort_value(),
     'description': e.get_description(),
     'media': [{'ref': r.ref, 'rect': r.rect} for r in e.get_media_list()],
     'participants': get_event_participants(db, e.handle),
