@@ -27,11 +27,11 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
       </style>
       <section>
         <div id="title">
-          <h2>${this._event.type}
-          ${this._participants[translate("Primary")]?html`:
+          <h2>${this._event.type}:
+          ${this._participants[translate("Primary")]?html`
           ${this._participants[translate("Primary")].map((p,i,arr)=>this._participantLink(p,i==arr.length-1))}
           `:""}
-          ${this._participants[translate("Family")]?html`:
+          ${this._participants[translate("Family")]?html`
           ${this._participants[translate("Family")].map((p,i,arr)=>this._participantLink(p,i==arr.length-1))}
           `:""}
           </h2>
