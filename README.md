@@ -65,8 +65,8 @@ Instructions will follow.
 
 - No user management
 - Tokens have infinite lifetime (refresh tokens would be more secure)
-- No display of sources, repositories, and notes
-- Private records not respected
+- ~~No display of sources, repositories, and notes~~
+- ~~Private records not respected~~
 - Read-only (no family tree editing)
 - ...
 
