@@ -8,6 +8,7 @@ from gramps.cli.grampscli import CLIManager
 from gramps.cli.user import User
 from gramps.gen.db.utils import get_dbid_from_path
 from gramps.gen.dbstate import DbState
+from gramps.gen.proxy import LivingProxyDb, PrivateProxyDb
 
 
 ALLOWED_DB_BACKENDS = [
@@ -18,24 +19,45 @@ ALLOWED_DB_BACKENDS = [
 class Db():
     """Class for database handling."""
 
-    def __init__(self, name):
+    def __init__(self, name,
+                 include_private=True, include_living=True):
         """Initialize the database object for family tree `name`.
 
         This will raise if the database backend is not `sqlite`.
-        The constructor does not open/lock the database yet."""
+        The constructor does not open/lock the database yet.
+        
+        Parameters:
+
+        - `include_private`: include records marked as private. Default True
+        - `include_living`: include living people. Default True
+        """
+        self.name = name
+        self.include_private = include_private
+        self.include_living = include_living
         self.dbstate = DbState()
         self.dbman = CLIDbManager(self.dbstate)
         self.user = User()
         self.smgr = CLIManager(self.dbstate, True, self.user)
         self.path = self.dbman.get_family_tree_path(name)
         if not self.path:
-            from gramps.gen.config import config
             raise ValueError("Family tree {} not found. Known trees: {}"
                              .format(name, self.dbman.family_tree_list()))
         self.db_backend = self.get_dbid()
         if self.db_backend not in ALLOWED_DB_BACKENDS:
             raise ValueError("Database backend '{}' of tree '{}' not supported."
                              .format(self.db_backend, name))
+
+
+    @property
+    def db(self):
+        """Return the database or a proxy database."""
+        _db = self.dbstate.db
+        if not self.include_private:
+            _db = PrivateProxyDb(_db)
+        if not self.include_living:
+            _db = LivingProxyDb(_db,
+                                LivingProxyDb.MODE_INCLUDE_FULL_NAME_ONLY)
+        return _db
 
     def get_dbid(self):
         """Get the database backend."""

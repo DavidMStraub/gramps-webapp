@@ -59,6 +59,8 @@ def display_date(date):
 def get_event_date_from_handle(db, handle):
     """Return a formatted date for the event."""
     ev = db.get_event_from_handle(handle)
+    if not ev:
+        return ''
     date = ev.get_date_object()
     return display_date(date)
 
@@ -73,6 +75,8 @@ def display_place(db, place):
 def get_event_place_from_handle(db, handle):
     """Get the event's place."""
     ev = db.get_event_from_handle(handle)
+    if not ev:
+        return ''
     return get_event_place(db, ev)
 
 
@@ -111,6 +115,8 @@ def get_father_id(db, f):
 def get_name_from_handle(db, handle):
     """Get the name of the person."""
     p = db.get_person_from_handle(handle)
+    if not p:
+        return ''
     sn = p.primary_name.get_surname()
     gn = nd.display_given(p)
     return '{}, {}'.format(sn, gn)
@@ -316,9 +322,10 @@ def repository_to_dict(db, r):
 
 def get_db_info(tree):
     """Return a dictionary with information about the database."""
-    db = tree.dbstate.db
+    db = tree.db
+    full_db = tree.dbstate.db
     return {
-    'name': db.get_dbname(),
+    'name': full_db.get_dbname(),
     'default_person': db.get_default_person().gramps_id,
     'researcher': db.get_researcher().get_name(),
     'number_people': db.get_number_of_people(),
@@ -330,42 +337,42 @@ def get_db_info(tree):
 
 def get_people(tree):
     """Return a nested dictionary with information about all the people."""
-    db = tree.dbstate.db
+    db = tree.db
     return {p.gramps_id: person_to_dict(db, p) for p in db.iter_people()}
 
 
 def get_families(tree):
     """Return a nested dictionary with information about all the families."""
-    db = tree.dbstate.db
+    db = tree.db
     return {f.gramps_id: family_to_dict(db, f) for f in db.iter_families()}
 
 
 def get_events(tree):
     """Return a nested dictionary with information about all the events."""
-    db = tree.dbstate.db
+    db = tree.db
     return {e.handle: event_to_dict(db, e) for e in db.iter_events()}
 
 def get_places(tree):
     """Return a nested dictionary with information about all the places."""
-    db = tree.dbstate.db
+    db = tree.db
     return {p.gramps_id: place_to_dict(db, p) for p in db.iter_places()}
 
 
 def get_citations(tree):
     """Return a nested dictionary with information about all the citations."""
-    db = tree.dbstate.db
+    db = tree.db
     return {c.gramps_id: citation_to_dict(db, c) for c in db.iter_citations()}
 
 
 def get_sources(tree):
     """Return a nested dictionary with information about all the sources."""
-    db = tree.dbstate.db
+    db = tree.db
     return {s.gramps_id: source_to_dict(db, s) for s in db.iter_sources()}
 
 
 def get_repositories(tree):
     """Return a nested dictionary with information about all the repositories."""
-    db = tree.dbstate.db
+    db = tree.db
     return {r.gramps_id: repository_to_dict(db, r) for r in db.iter_repositories()}
 
 
@@ -376,7 +383,7 @@ def get_translation(strings):
 
 def get_media_info(tree, handle):
     """Return a dictionary with information about the media object."""
-    db = tree.dbstate.db
+    db = tree.db
     m = db.get_media_from_handle(handle)
     base_path = expand_media_path(db.get_mediapath(), db)
     return {

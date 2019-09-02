@@ -23,10 +23,24 @@ from .gramps import (get_db_info, get_events, get_families, get_media_info,
 from .image import get_thumbnail, get_thumbnail_cropped
 
 
+def Boolean(v):
+    """Coerce value `v` to boolean."""
+    if isinstance(v, str):
+        if v.lower() in ['yes', 'y', 'true']:
+            return True
+        elif v.lower() in ['no', 'n', 'false']:
+            return False
+        raise ValueError("Cannot corce string {} to boolean".format(v))
+    else:
+        return bool(v)
+
+
 def get_db():
     """Get a new `Db` instance. Called before every request. Cached on first call."""
     if 'db' not in g:
-        g.db = Db(current_app.config['TREE'])
+        g.db = Db(current_app.config['TREE'],
+                  include_private=not current_app.config['GRAMPS_EXCLUDE_PRIVATE'],
+                  include_living=not current_app.config['GRAMPS_EXCLUDE_LIVING'])
     return g.db
 
 
@@ -41,10 +55,13 @@ def create_app():
     """Flask application factory."""
     app = Flask(__name__, static_folder='js')
     app.config['PROPAGATE_EXCEPTIONS'] = True
-    app.config['TREE'] = os.environ.get('TREE')
+    app.config['TREE'] = os.getenv('TREE')
+    app.config['GRAMPS_EXCLUDE_PRIVATE'] = Boolean(os.getenv('GRAMPS_EXCLUDE_PRIVATE'))
+    app.config['GRAMPS_EXCLUDE_LIVING'] = Boolean(os.getenv('GRAMPS_EXCLUDE_LIVING'))
+    app.config['TREE'] = os.getenv('TREE')
     if app.config['TREE'] is None or app.config['TREE'] == '':
         raise ValueError("You have to set the `TREE` environment variable.")
-    app.config['PASSWORD'] = os.environ.get('PASSWORD') or ''
+    app.config['PASSWORD'] = os.getenv('PASSWORD') or ''
     if not app.config['PASSWORD']:
         logging.warn("The password is empty! The app will not be protected.")
 
@@ -61,7 +78,7 @@ def create_app():
 
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'query_string']
 
-    jwt_secret_key = os.environ.get('JWT_SECRET_KEY')
+    jwt_secret_key = os.getenv('JWT_SECRET_KEY')
     if jwt_secret_key is None:
         if os.path.exists('jwt_secret_key'):
             with open('jwt_secret_key', 'r') as f:
