@@ -83,8 +83,9 @@ import{html$2 as html,PageViewElement,asteriskIcon,crossIcon,connect,store,trans
           <paper-tab>${translate("Events")}</paper-tab>
           <paper-tab>${translate("Parents")}</paper-tab>
           <paper-tab>${translate("Families")}</paper-tab>
-          <paper-tab><div style="display:inline-block"><span>${translate("Gallery")}</span>${this._media.length?html` <paper-badge label="${this._media.length}"></paper-badge></div>
-          `:""}</paper-tab>
+          <paper-tab><div style="display:inline-block"><span>${translate("Gallery")}</span>${this._media.length?html` <paper-badge label="${this._media.length}"></paper-badge>
+          `:""}</div></paper-tab>
+          <paper-tab>${translate("Sources")}</paper-tab>
         </paper-tabs>
         </div>
       </section>
@@ -106,8 +107,14 @@ import{html$2 as html,PageViewElement,asteriskIcon,crossIcon,connect,store,trans
         father
         mother></gr-family-element>`):""}
       </section>
+
       <section  ?hidden=${3!=this._selected}>
       <gr-gallery-element .images=${this._media} host=${this._host} token=${this._token}>
       </gr-gallery-element>
       </section>
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._selected=0}static get properties(){return{_gramps_id:{type:String},_person:{type:Object},_parents:{type:String},_host:{type:String},_token:{type:String},_events:{type:Object},_selected:{type:Number}}}_handleSelected(ev){this._selected=ev.detail.selected;window.location.hash=this._selected}_onHashChange(ev){this._selected=ev.newURL.split("#")[1]}firstUpdated(){window.addEventListener("hashchange",this._onHashChange);if(window.location.hash.split("#")[1]!=void 0){this._selected=window.location.hash.split("#")[1]}}_get_place_name(state,event){if(event.place!=void 0&&""!=event.place&&state.api&&state.api.places){event.place_name=state.api.places[event.place].name};return event}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activePerson;this._person=state.api.people[this._gramps_id];this._hidden=!store.getState().app.wideLayout;if(this._person!=void 0){this._parents=this._person.parents;this._events=this._person.events.map(function(r){let obj=state.api.events[r.ref];if(r.role==translate("Primary")){obj.role=""}else{obj.role=r.role}return obj});this._events=this._events.map(e=>this._get_place_name(state,e));if(""!=this._person.birthplace){this._person.birthplace_name=state.api.places[this._person.birthplace].name}if(""!=this._person.deathplace){this._person.deathplace_name=state.api.places[this._person.deathplace].name}this._media=this._person.media}}}window.customElements.define("gr-view-person",MyViewPerson);
+
+      <section  ?hidden=${4!=this._selected}>
+      <gr-citations-element .citations=${this._citations}>
+      </gr-citations-element>
+        </section>
+      `}static get styles(){return[SharedStyles]}constructor(){super();this._selected=0}static get properties(){return{_gramps_id:{type:String},_person:{type:Object},_parents:{type:String},_host:{type:String},_token:{type:String},_events:{type:Object},_selected:{type:Number}}}_handleSelected(ev){this._selected=ev.detail.selected;window.location.hash=this._selected}_onHashChange(ev){this._selected=ev.newURL.split("#")[1]}firstUpdated(){window.addEventListener("hashchange",this._onHashChange);if(window.location.hash.split("#")[1]!=void 0){this._selected=window.location.hash.split("#")[1]}}_get_place_name(state,event){if(event.place!=void 0&&""!=event.place&&state.api&&state.api.places){event.place_name=state.api.places[event.place].name};return event}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activePerson;this._person=state.api.people[this._gramps_id];this._hidden=!store.getState().app.wideLayout;if(this._person!=void 0){this._parents=this._person.parents;this._events=this._person.events.map(function(r){let obj=state.api.events[r.ref];if(r.role==translate("Primary")){obj.role=""}else{obj.role=r.role}return obj});this._events=this._events.map(e=>this._get_place_name(state,e));if(""!=this._person.birthplace){this._person.birthplace_name=state.api.places[this._person.birthplace].name}if(""!=this._person.deathplace){this._person.deathplace_name=state.api.places[this._person.deathplace].name}this._media=this._person.media;this._citations=this._person.citations}}}window.customElements.define("gr-view-person",MyViewPerson);

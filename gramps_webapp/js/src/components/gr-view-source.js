@@ -36,6 +36,12 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
               <td>${this._source.pubinfo}</td>
             </tr>
           `}
+          ${""==this._source.repositories?"":html`
+            <tr>
+              <th>${translate("Repositories")}</th>
+              <td>${this._repositories.join(", ")}</td>
+            </tr>
+          `}
         </table>
 
 
@@ -45,4 +51,4 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
 
       </section>
 
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._media=[]}static get properties(){return{_source:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_media:{type:Object}}}firstUpdated(){}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activeSource;this._source=state.api.sources[this._gramps_id];if(this._source!=void 0){this._media=this._source.media}}}window.customElements.define("gr-view-source",MyViewSource);
+    `}static get styles(){return[SharedStyles]}constructor(){super();this._media=[]}static get properties(){return{_source:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_media:{type:Object}}}firstUpdated(){}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activeSource;this._source=state.api.sources[this._gramps_id];if(this._source!=void 0){this._media=this._source.media;this._repositories=this._source.repositories.map(repo=>state.api.repositories[repo].title)}}}window.customElements.define("gr-view-source",MyViewSource);
