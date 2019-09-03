@@ -10,6 +10,7 @@ from gramps.gen.utils.db import get_marriage_or_fallback
 from gramps.gen.utils.file import expand_media_path
 from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
+from gramps.plugins.lib.libhtmlbackend import HtmlBackend
 
 
 nd = NameDisplay()
@@ -320,13 +321,20 @@ def repository_to_dict(db, r):
     }
 
 
+def get_default_person_gramps_id(db):
+    p = db.get_default_person()
+    if p is None:
+        return ''
+    return p.gramps_id
+
+
 def get_db_info(tree):
     """Return a dictionary with information about the database."""
     db = tree.db
     full_db = tree.dbstate.db
     return {
     'name': full_db.get_dbname(),
-    'default_person': db.get_default_person().gramps_id,
+    'default_person': get_default_person_gramps_id(db),
     'researcher': db.get_researcher().get_name(),
     'number_people': db.get_number_of_people(),
     'number_events': db.get_number_of_events(),
@@ -392,3 +400,21 @@ def get_media_info(tree, handle):
         'full_path': os.path.join(base_path, m.path),
 
     }
+
+
+def get_note(tree, gramps_id, fmt='html'):
+    """Return the type and content of a note.
+    
+    By default, the format of the content is HTML.
+    If `fmt` is 'text' or None, it is returned as pure text instead."""
+    db = tree.db
+    note = db.get_note_from_gramps_id(gramps_id)
+    note_type = note.type.string
+    if fmt == 'text' or fmt is None:
+        return str(note.text)
+    elif fmt == 'html':
+        _backend = HtmlBackend()
+    else:
+        raise ValueError("Format {} not recognized.".format(fmt))
+    note_markup = _backend.add_markup_from_styled(note.text, note.text.get_tags())
+    return {'type': note_type, 'content': note_markup}
