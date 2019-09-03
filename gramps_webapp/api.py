@@ -19,7 +19,8 @@ from flask_restful import Api, Resource, reqparse
 from .db import Db
 from .gramps import (get_db_info, get_events, get_families, get_media_info,
                      get_people, get_places, get_translation,
-                     get_citations, get_sources, get_repositories)
+                     get_citations, get_sources, get_repositories,
+                     get_note)
 from .image import get_thumbnail, get_thumbnail_cropped
 
 
@@ -116,6 +117,7 @@ def create_app():
 
     parser = reqparse.RequestParser()
     parser.add_argument('strings', type=str)
+    parser.add_argument('fmt', type=str)
 
 
     @app.before_request
@@ -200,6 +202,12 @@ def create_app():
                 return {"error": str(e)}
             return {"data": get_translation(strings)}
 
+    class Note(Resource):
+        @cache.cached(query_string=True)
+        def get(self, gramps_id):
+            args = parser.parse_args()
+            fmt = args.get('fmt') or 'html'
+            return get_note(get_db(), gramps_id, fmt=fmt)
 
     api.add_resource(People, '/api/people')
     api.add_resource(Families, '/api/families')
@@ -211,6 +219,7 @@ def create_app():
     api.add_resource(Translate, '/api/translate')
     api.add_resource(DbInfo, '/api/dbinfo')
     api.add_resource(FullTree, '/api/tree')
+    api.add_resource(Note, '/api/note/<string:gramps_id>')
 
 
     @app.route('/api/media/<string:handle>')
