@@ -222,6 +222,12 @@ def get_citation_ids(db, x):
     return [db.get_citation_from_handle(h).gramps_id for h in x.get_citation_list()]
 
 
+def get_note_ids(db, x):
+    """Get the Gramps IDs of direct notes of object x
+    (e.g. person, event, family, place)"""
+    return [db.get_note_from_handle(h).gramps_id for h in x.get_note_list()]
+
+
 def family_to_dict(db, f):
     """Return a dictionary with information about the family."""
     return {
@@ -236,6 +242,7 @@ def family_to_dict(db, f):
     'events': [r.ref for r in f.get_event_ref_list()],
     'media': [r.ref for r in f.get_media_list()],
     'citations': get_citation_ids(db, f),
+    'notes': get_note_ids(db, f),
     }
 
 
@@ -255,6 +262,7 @@ def person_to_dict(db, p):
     'events': [{'ref': r.ref, 'role': r.get_role().string} for r in p.get_event_ref_list()],
     'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
     'citations': get_citation_ids(db, p),
+    'notes': get_note_ids(db, p),
     }
 
 
@@ -270,6 +278,7 @@ def place_to_dict(db, p):
     'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
     'hierarchy': get_main_location(db, p),
     'citations': get_citation_ids(db, p),
+    'notes': get_note_ids(db, p),
     }
 
 
@@ -286,6 +295,7 @@ def event_to_dict(db, e):
     'media': [{'ref': r.ref, 'rect': r.rect} for r in e.get_media_list()],
     'participants': get_event_participants(db, e.handle),
     'citations': get_citation_ids(db, e),
+    'notes': get_note_ids(db, e),
     }
 
 
@@ -296,7 +306,8 @@ def citation_to_dict(db, c):
     'source': db.get_source_from_handle(c.get_reference_handle()).gramps_id,
     'media': [{'ref': r.ref, 'rect': r.rect} for r in c.get_media_list()],
     'date': dd.display(c.date),
-    'page': c.page
+    'page': c.page,
+    'notes': get_note_ids(db, c),
     }
 
 
@@ -309,6 +320,7 @@ def source_to_dict(db, s):
     'repositories': [db.get_repository_from_handle(r.ref).gramps_id for r in s.get_reporef_list()],
     'author': s.author,
     'pubinfo': s.pubinfo,
+    'notes': get_note_ids(db, s),
     }
 
 
@@ -318,6 +330,7 @@ def repository_to_dict(db, r):
     'gramps_id': r.gramps_id,
     'title': r.name,
     'type': r.get_type().string,
+    'notes': get_note_ids(db, r),
     }
 
 
