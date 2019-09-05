@@ -430,4 +430,4 @@ def get_note(tree, gramps_id, fmt='html'):
     else:
         raise ValueError("Format {} not recognized.".format(fmt))
     note_markup = _backend.add_markup_from_styled(note.text, note.text.get_tags())
-    return {'type': note_type, 'content': note_markup}
+    return {'type': note_type, 'content': note_markup, 'gramps_id': gramps_id}

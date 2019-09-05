@@ -202,7 +202,7 @@ def create_app():
                 return {"error": str(e)}
             return {"data": get_translation(strings)}
 
-    class Note(Resource):
+    class Note(ProtectedResource):
         @cache.cached(query_string=True)
         def get(self, gramps_id):
             args = parser.parse_args()
