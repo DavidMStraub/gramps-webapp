@@ -1,4 +1,4 @@
-import{html$2 as html,PageViewElement,SharedStyles,connect,translate,store}from"./gr-app.js";class MyViewSources extends connect(store)(PageViewElement){render(){return html`
+import{html$2 as html,PageViewElement,SharedStyles,connect,translate,store,paperclipIcon}from"./gr-app.js";class MyViewSources extends connect(store)(PageViewElement){render(){return html`
       <section>
         <vaadin-grid .items=${this._sources} theme="row-dividers" multi-sort>
           <vaadin-grid-selection-column auto-select hidden></vaadin-grid-selection-column>
@@ -28,5 +28,12 @@ import{html$2 as html,PageViewElement,SharedStyles,connect,translate,store}from"
               [[item.author]]
             </template>
           </vaadin-grid-column>
+          <vaadin-grid-column ?hidden="${this._hidden}">
+          <template>
+            <template is="dom-if" if="[[item.has_attachment]]">
+              ${paperclipIcon}
+            </template>
+          </template>
+          </vaadin-grid-column>
         </vaadin-grid>
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._hidden=!1}static get properties(){return{_sources:{type:Object},_hidden:{type:Boolean}}}stateChanged(state){this._sources=Object.values(state.api.sources);this._hidden=!store.getState().app.wideLayout}firstUpdated(){}}window.customElements.define("gr-view-sources",MyViewSources);
+    `}static get styles(){return[SharedStyles]}constructor(){super();this._hidden=!1}static get properties(){return{_sources:{type:Object},_hidden:{type:Boolean}}}stateChanged(state){this._sources=Object.values(state.api.sources);this._sources=this._sources.map(function(s){s.has_attachment=!1;if(0<s.media.length||0<s.notes.length){s.has_attachment=!0}return s});this._hidden=!store.getState().app.wideLayout}firstUpdated(){}}window.customElements.define("gr-view-sources",MyViewSources);

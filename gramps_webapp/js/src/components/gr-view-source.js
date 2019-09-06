@@ -49,6 +49,13 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
         <gr-gallery-element .images=${this._media} host="${this._host}" token="${this._token}">
         </gr-gallery-element>
 
-      </section>
 
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._media=[]}static get properties(){return{_source:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_media:{type:Object}}}firstUpdated(){}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activeSource;this._source=state.api.sources[this._gramps_id];if(this._source!=void 0){this._media=this._source.media;this._repositories=this._source.repositories.map(repo=>state.api.repositories[repo].title)}}}window.customElements.define("gr-view-source",MyViewSource);
+        ${this._notes.length?html`<h3>${translate("Notes")}</h3>`:""}
+        ${this._notes.map(n=>html`
+        <gr-note-element grampsid=${n}>
+        </gr-note-element>
+        `)}
+
+        </section>
+
+    `}static get styles(){return[SharedStyles]}constructor(){super();this._media=[]}static get properties(){return{_source:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_media:{type:Object}}}firstUpdated(){}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activeSource;this._source=state.api.sources[this._gramps_id];if(this._source!=void 0){this._media=this._source.media;this._notes=this._source.notes;this._repositories=this._source.repositories.map(repo=>state.api.repositories[repo].title)}}}window.customElements.define("gr-view-source",MyViewSource);

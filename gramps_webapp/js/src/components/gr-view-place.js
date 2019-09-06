@@ -78,10 +78,16 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
         </gr-leaflet-map>
         `:""}
 
+        ${this._notes.length?html`<h3>${translate("Notes")}</h3>`:""}
+        ${this._notes.map(n=>html`
+        <gr-note-element grampsid=${n}>
+        </gr-note-element>
+        `)}
+
         ${this._citations.length?html`<h3>${translate("Sources")}</h3>`:""}
         <gr-citations-element .citations=${this._citations}>
         </gr-citations-element>
-
+        
       </section>
 
     `}static get styles(){return[SharedStyles]}constructor(){super();this._selected=0;this._media=[]}static get properties(){return{_place:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_events:{type:Object},_media:{type:Object},_hierarchy:{type:Object},_selected:{type:Number}}}_handleSelected(ev){this._selected=ev.detail.selected;window.location.hash=this._selected}_onHashChange(ev){this._selected=ev.newURL.split("#")[1]}firstUpdated(){window.addEventListener("hashchange",this._onHashChange);if(window.location.hash.split("#")[1]!=void 0){this._selected=window.location.hash.split("#")[1]}}_personLink(p,lastItem){if(p==void 0){return""}return html`
@@ -93,6 +99,6 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
 //   };
 //   return event;
 // }
-stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activePlace;this._place=state.api.places[this._gramps_id];if(this._place!=void 0){this._media=this._place.media;this._hierarchy=this._place._hierarchy;this._citations=this._place.citations}// this._events = Object.values(state.api.events).filter((e) => e.place == this._gramps_id);
+stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activePlace;this._place=state.api.places[this._gramps_id];if(this._place!=void 0){this._media=this._place.media;this._hierarchy=this._place._hierarchy;this._citations=this._place.citations;this._notes=this._place.notes}// this._events = Object.values(state.api.events).filter((e) => e.place == this._gramps_id);
 // this._events = this._events.map((e) => this._get_place_name(state, e));
 }}window.customElements.define("gr-view-place",MyViewPlace);
