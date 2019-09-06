@@ -10,7 +10,9 @@ from gramps.gen.utils.db import get_marriage_or_fallback
 from gramps.gen.utils.file import expand_media_path
 from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
-from gramps.plugins.lib.libhtmlbackend import HtmlBackend
+from gramps.plugins.lib.libhtmlbackend import HtmlBackend, process_spaces
+from gramps.plugins.lib.libhtml import Html
+from gramps.gen.lib import NoteType
 
 
 nd = NameDisplay()
@@ -426,8 +428,60 @@ def get_note(tree, gramps_id, fmt='html'):
     if fmt == 'text' or fmt is None:
         return str(note.text)
     elif fmt == 'html':
-        _backend = HtmlBackend()
+        htmlnotetext = styled_note(note.get_styledtext(),
+                                note.get_format(),
+                                contains_html=(note.get_type() == NoteType.HTML_CODE))
+        return {'type': note_type, 'content': htmlnotetext, 'gramps_id': gramps_id}
+    raise ValueError("Format {} not recognized.".format(fmt))
+
+
+def styled_note(styledtext, format, contains_html=False):
+    """Return the note in HTML format.
+
+    Adapted from DynamicWeb.
+    """
+    _backend = HtmlBackend()
+
+    text = str(styledtext)
+
+    if (not text): return('')
+
+    s_tags = styledtext.get_tags()
+    htmllist = Html("div", class_="grampsstylednote")
+    if contains_html:
+        markuptext = _backend.add_markup_from_styled(text,
+                                                            s_tags,
+                                                            split='\n',
+                                                            escape=False)
+        htmllist += markuptext
     else:
-        raise ValueError("Format {} not recognized.".format(fmt))
-    note_markup = _backend.add_markup_from_styled(note.text, note.text.get_tags())
-    return {'type': note_type, 'content': note_markup, 'gramps_id': gramps_id}
+        markuptext = _backend.add_markup_from_styled(text,
+                                                            s_tags,
+                                                            split='\n')
+        linelist = []
+        linenb = 1
+        sigcount = 0
+        for line in markuptext.split('\n'):
+            [line, sigcount] = process_spaces(line, format)
+            if sigcount == 0:
+                # The rendering of an empty paragraph '<p></p>'
+                # is undefined so we use a non-breaking space
+                if linenb == 1:
+                    linelist.append('&nbsp;')
+                htmllist.extend(Html('p') + linelist)
+                linelist = []
+                linenb = 1
+            else:
+                if linenb > 1:
+                    linelist[-1] += '<br />'
+                linelist.append(line)
+                linenb += 1
+        if linenb > 1:
+            htmllist.extend(Html('p') + linelist)
+        # if the last line was blank, then as well as outputting the previous para,
+        # which we have just done,
+        # we also output a new blank para
+        if sigcount == 0:
+            linelist = ["&nbsp;"]
+            htmllist.extend(Html('p') + linelist)
+    return '\n'.join(htmllist)
