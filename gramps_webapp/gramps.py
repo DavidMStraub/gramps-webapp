@@ -336,6 +336,18 @@ def repository_to_dict(db, r):
     }
 
 
+def media_to_dict(db, m):
+    """Return a dictionary with information about the media object."""
+    return {
+    'gramps_id': m.gramps_id,
+    'desc': m.get_description(),
+    'notes': get_note_ids(db, m),
+    'citations': get_citation_ids(db, m),
+    'mime': m.get_mime_type(),
+    'date': dd.display(m.date),
+    }
+
+
 def get_default_person_gramps_id(db):
     p = db.get_default_person()
     if p is None:
@@ -397,6 +409,11 @@ def get_repositories(tree):
     """Return a nested dictionary with information about all the repositories."""
     db = tree.db
     return {r.gramps_id: repository_to_dict(db, r) for r in db.iter_repositories()}
+
+def get_media(tree):
+    """Return a nested dictionary with information about all the media objects."""
+    db = tree.db
+    return {m.handle: media_to_dict(db, m) for m in db.iter_media()}
 
 
 def get_translation(strings):

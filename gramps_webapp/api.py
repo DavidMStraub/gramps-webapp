@@ -20,7 +20,7 @@ from .db import Db
 from .gramps import (get_db_info, get_events, get_families, get_media_info,
                      get_people, get_places, get_translation,
                      get_citations, get_sources, get_repositories,
-                     get_note)
+                     get_note, get_media)
 from .image import get_thumbnail, get_thumbnail_cropped
 
 
@@ -171,6 +171,11 @@ def create_app():
         def get(self):
             return get_repositories(get_db())
 
+    class MediaObjects(ProtectedResource):
+        @cache.cached()
+        def get(self):
+            return get_media(get_db())
+
 
     class DbInfo(ProtectedResource):
         @cache.cached()
@@ -189,6 +194,7 @@ def create_app():
                 'citations': get_citations(get_db()),
                 'sources': get_sources(get_db()),
                 'repositories': get_repositories(get_db()),
+                'media': get_media(get_db()),
                 'dbinfo': get_db_info(get_db()),
             } 
 
@@ -215,6 +221,7 @@ def create_app():
     api.add_resource(Places, '/api/places')
     api.add_resource(Citations, '/api/citations')
     api.add_resource(Sources, '/api/sources')
+    api.add_resource(MediaObjects, '/api/mediaobjects')
     api.add_resource(Repositories, '/api/repositories')
     api.add_resource(Translate, '/api/translate')
     api.add_resource(DbInfo, '/api/dbinfo')
