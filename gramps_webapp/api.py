@@ -241,7 +241,8 @@ def create_app():
     @cache.cached()
     def show_thumbnail_square(handle, size):
         info = get_media_info(get_db(), handle)
-        tn = get_thumbnail(info['full_path'], size, square=True)
+        tn = get_thumbnail(info['full_path'], size,
+                           square=True, mime=info['mime'])
         return send_file(tn, info['mime'])
 
 
@@ -250,7 +251,8 @@ def create_app():
     @cache.cached()
     def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
         info = get_media_info(get_db(), handle)
-        tn = get_thumbnail_cropped(info['full_path'], size, x1, y1, x2, y2, square=True)
+        tn = get_thumbnail_cropped(info['full_path'], size, x1, y1, x2, y2,
+                                   square=True, mime=info['mime'])
         return send_file(tn, info['mime'])
 
     return app

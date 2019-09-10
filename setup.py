@@ -24,7 +24,8 @@ setup(name='gramps-webapp',
                         'flask-caching',
                         'flask-jwt-extended',
                         'flask-cors',
-                        'Pillow'],
+                        'Pillow',
+                        'pdf2image'],
       entry_points={
         'console_scripts': [
             'gramps_webapp=gramps_webapp.api:cli'
