@@ -44,8 +44,7 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
           `}
         </table>
 
-
-        ${this._media.length?html`<h3>${translate("Gallery")}</h3>`:""}
+        ${this._media.length?html`<h3>${translate("Media")}</h3>`:""}
         <gr-gallery-element .images=${this._media} host="${this._host}" token="${this._token}">
         </gr-gallery-element>
 
@@ -58,4 +57,4 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
 
         </section>
 
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._media=[]}static get properties(){return{_source:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_media:{type:Object}}}firstUpdated(){}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activeSource;this._source=state.api.sources[this._gramps_id];if(this._source!=void 0){this._media=this._source.media;this._notes=this._source.notes;this._repositories=this._source.repositories.map(repo=>state.api.repositories[repo].title)}}}window.customElements.define("gr-view-source",MyViewSource);
+    `}static get styles(){return[SharedStyles]}constructor(){super();this._media=[]}static get properties(){return{_source:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_media:{type:Object}}}firstUpdated(){}_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activeSource;this._source=state.api.sources[this._gramps_id];if(this._source!=void 0){this._media=this._addMimeType(this._source.media,state);this._notes=this._source.notes;this._repositories=this._source.repositories.map(repo=>state.api.repositories[repo].title)}}}window.customElements.define("gr-view-source",MyViewSource);

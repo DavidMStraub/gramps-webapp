@@ -56,7 +56,7 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
           `})}
         </table>
 
-        ${this._media.length?html`<h3>${translate("Gallery")}</h3>`:""}
+        ${this._media.length?html`<h3>${translate("Media")}</h3>`:""}
         <gr-gallery-element .images=${this._media} host="${this._host}" token="${this._token}">
         </gr-gallery-element>
 
@@ -99,6 +99,6 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
 //   };
 //   return event;
 // }
-stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activePlace;this._place=state.api.places[this._gramps_id];if(this._place!=void 0){this._media=this._place.media;this._hierarchy=this._place._hierarchy;this._citations=this._place.citations;this._notes=this._place.notes}// this._events = Object.values(state.api.events).filter((e) => e.place == this._gramps_id);
+_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activePlace;this._place=state.api.places[this._gramps_id];if(this._place!=void 0){this._media=this._addMimeType(this._place.media,state);this._hierarchy=this._place._hierarchy;this._citations=this._place.citations;this._notes=this._place.notes}// this._events = Object.values(state.api.events).filter((e) => e.place == this._gramps_id);
 // this._events = this._events.map((e) => this._get_place_name(state, e));
 }}window.customElements.define("gr-view-place",MyViewPlace);
