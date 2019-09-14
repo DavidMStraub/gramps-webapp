@@ -23,13 +23,18 @@ import{html$2 as html,PageViewElement,asteriskIcon,crossIcon,connect,store,trans
         --paper-tab-ink: var(--app-secondary-color);
         --paper-tabs-selection-bar-color: var(--app-secondary-color);
         --paper-badge-background:  var(--app-primary-color);
-        --paper-badge-margin-left: 20px;
-      }
+        --paper-badge-margin-left: -12px;
+          }
       paper-tabs {
         /* background-color: var(--app-section-even-color); */
         color: var(--app-dark-text-color);
         font-weight: 400;
         font-size: 15px;
+      }
+      paper-tab {
+        padding: 0px 16px;
+        overflow: visible;
+        display: inline-block;
       }
       /* Wide layout */
       @media (min-width: 768px) {
