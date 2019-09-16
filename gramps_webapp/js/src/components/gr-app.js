@@ -20044,7 +20044,7 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
     background: var(--app-section-even-color);
   }
 
-  h2, h3, h4 {
+  h2, h3, h4, h5 {
     text-align: left;
     /*color: var(--app-dark-text-color);*/
   }
@@ -20062,6 +20062,12 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
   h4 {
     font-size: 16px;
     font-weight: 400;
+    margin: 0.67em 0;
+  }
+
+  h5 {
+    font-size: 16px;
+    font-weight: 300;
     margin: 0.67em 0;
   }
 
@@ -20130,11 +20136,11 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
   .arrow {
     position: absolute;
   }
-  vaadin-grid {
+  vaadin-grid.fullscreen {
     height:calc(100vh - 48px);
   }
   @media (min-width: 768px) {
-    vaadin-grid {
+    vaadin-grid.fullscreen {
       height:calc(100vh - 48px);
       margin-top: 0;
     }
@@ -20179,7 +20185,118 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
         <span @click="${this._closeLightbox}" class="link">${closeIcon}</span>
       </div>
       </div>
-      `}}static get styles(){return[SharedStyles]}constructor(){super();this.opened=!1}_closeLightbox(){this.opened=!1;this.dispatchEvent(new CustomEvent("lightbox-opened-changed",{bubbles:!0,composed:!0,detail:{opened:!1}}));this.dispatchEvent(new CustomEvent("medium-selected",{bubbles:!0,composed:!0,detail:{id:""}}))}firstUpdated(){}_handleKeyPress(e){if("Escape"===e.key){this._closeLightbox()}}static get properties(){return{opened:{type:Boolean,notify:!0,reflectToAttribute:!0}}}_focus(){if(this.opened){const lightBox=this.shadowRoot.getElementById("lightbox");lightBox.focus()}}updated(){this._focus()}}window.customElements.define("gr-lightbox-element",MyLightboxElement);class MyMediaElement extends connect(store)(LitElement){render(){if(this.media){return html$1`
+      `}}static get styles(){return[SharedStyles]}constructor(){super();this.opened=!1}_closeLightbox(){this.opened=!1;this.dispatchEvent(new CustomEvent("lightbox-opened-changed",{bubbles:!0,composed:!0,detail:{opened:!1}}));this.dispatchEvent(new CustomEvent("medium-selected",{bubbles:!0,composed:!0,detail:{id:""}}))}firstUpdated(){}_handleKeyPress(e){if("Escape"===e.key){this._closeLightbox()}}static get properties(){return{opened:{type:Boolean,notify:!0,reflectToAttribute:!0}}}_focus(){if(this.opened){const lightBox=this.shadowRoot.getElementById("lightbox");lightBox.focus()}}updated(){this._focus()}}window.customElements.define("gr-lightbox-element",MyLightboxElement);class MyNoteElement extends connect(store)(LitElement){render(){if(this._note==void 0){return html$1`
+      <p>Loading ...</p>
+      `}if("error"==this._note.content){return html$1`
+      <paper-card>
+        <div class="card-content">
+        <p>Error. <a class="link" @click="${this._reloadNote}">Reload</a></p>
+        </div>
+      </paper-card>
+      `}return html$1`
+      <style>
+      paper-card {
+        margin: 10px 0px;
+        width: 100%;
+      }
+      .card-content p {
+        margin: 1em 0;
+      }
+      .card-content p:first-child {
+        margin-top: 0;
+      }
+      .card-content p:last-child {
+        margin-bottom: 0;
+      }
+      .handle {
+        font-size: 0.8em;
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 0.3em 0.5em;
+        margin: 0 0.3em;
+        border-radius: 0.5em;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.4);
+      }
+      .note-head {
+        margin-bottom: 1em;
+      }
+      .note-head svg {
+        height: 1.5em;
+        top: .42em;
+        position: relative;
+      }
+      .note-head svg path {
+        fill: rgba(0, 0, 0, 0.35);
+      }
+      </style>
+      <paper-card>
+        <div class="card-content">
+          <div class="note-head">
+            ${documentIcon}
+            <span class="handle">${this.grampsid}</span>
+          </div>
+          <div id="note-content"></div>
+        </div>
+      </paper-card>
+      `}static get styles(){return[SharedStyles]}firstUpdated(){}static get properties(){return{grampsid:{type:String},_note:{type:Object}}}connectedCallback(){super.connectedCallback();let state=store.getState();if(state.api.token!=void 0){this.getNote()}}_reloadNote(){this._note=void 0;store.dispatch(loadNote(this._host,this._token,this.grampsid))}getNote(){let state=store.getState();this._host=state.app.host;this._token=state.api.token;store.dispatch(loadNote(this._host,this._token,this.grampsid))}stateChanged(state){if(this._token==void 0){this.getNote()}if(state.api.notes!=void 0&&state.api.notes[this.grampsid]!=void 0){this._note=state.api.notes[this.grampsid];let noteContent=this.shadowRoot.getElementById("note-content");if(noteContent!=void 0){noteContent.innerHTML=this._note.content}}}}window.customElements.define("gr-note-element",MyNoteElement);class MyCitationsElement extends connect(store)(LitElement){render(){var _host=this._host,_token=this._token,_addMimeType=this._addMimeType;let state=store.getState();this._citations=this.citations.map(c=>state.api.citations[c]);this._sources=this.citations.map(c=>state.api.sources[state.api.citations[c].source]);this._sources=[...new Set(this._sources)];// eliminate duplicates
+return html$1`
+      <style>
+      h4 svg {
+        height: 1.6em;
+        top: .46em;
+        position: relative;
+      }
+      h5 svg {
+        height: 2em;
+        top: 0.6em;
+        position: relative;
+      }
+      h4 svg path, h5 svg path {
+        fill: rgba(0, 0, 0, 0.2);
+      }
+      .handle {
+        font-size: 0.8em;
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 0.3em 0.5em;
+        margin: 0 0.3em;
+        border-radius: 0.5em;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.4);
+      }
+      div.citation {
+        margin-left: 1em;
+      }
+      div.citation-content {
+        margin-left: 2em;
+      }
+      </style>
+      ${this._sources.map(source=>html$1`
+      <h4><a href="/source/${source.gramps_id}">${bookIcon} ${source.title}  <span style="font-size:0.7em;top:-0.2em;position:relative;"><span class="handle">${source.gramps_id}</span></span></a>
+      ${source.media.length||source.notes.length?paperclipIcon:""}
+      </h4>
+      ${this._citations.map(function(citation){if(citation.source!=source.gramps_id){return html$1``}return html$1`
+          <div class="citation">
+            <h5>${quoteCloseIcon}  ${citation.page?citation.page:translate$1("Citation")}</h5>
+            <div class="citation-content">
+              ${citation.notes.map(n=>html$1`
+              <gr-note-element grampsid=${n}>
+              </gr-note-element>
+              `)}
+            </div>
+            <div style="clear:left;"></div>
+
+            <div class="citation-content">
+              <gr-gallery-element
+                .images=${_addMimeType(citation.media,store.getState())}
+                host=${_host}
+                token=${_token}>
+              </gr-gallery-element>
+            </div>
+            <div style="clear:left;"></div>
+          </div>
+        `})}
+      `)}
+    `}static get styles(){return[SharedStyles]}firstUpdated(){}static get properties(){return{citations:{type:Array}}}_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token}}window.customElements.define("gr-citations-element",MyCitationsElement);class MyMediaElement extends connect(store)(LitElement){render(){if(this.media){return html$1`
         <style>
         div.media-container {
           position: absolute;
@@ -20196,8 +20313,10 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
           transform: translate(-50%, -50%);
           display: inline-block;
           max-height: 100vh;
-          max-width: 100vw;
           color: rgba(255, 255, 255, 0.8);
+        }
+        div.inner-container img {
+          display: block;
         }
         div.inner-container a {
           color: rgba(255, 255, 255, 0.8);
@@ -20247,6 +20366,36 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
             display: block;
           }
         }
+        .label {
+          color: #777;
+          font-size: 0.8em;
+          font-weight: 500;
+          margin-bottom: 0.25em;
+        }
+        div.meta-container {
+          background-color: rgba(255, 255, 255, 0.9);
+          color: rgba(0, 0, 0, 0.75);
+          text-align: left;
+          font-size: 0.8em;
+          padding: 1em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        @media (min-width: 768px) {
+          div.inner-container {
+            left: calc(50% - 100px);
+          }
+          div.media-container img {
+            max-width:calc(100vw - 200px);
+          }
+          div.meta-container {
+            width: calc(200px - 2em);
+            min-height:calc(100% - 2em);
+            position: absolute;
+            right: -200px;
+            top: 0;
+          }
+        }
         </style>
         <div class="media-container"
          style="transform: translateX(${this._translateX}px);"
@@ -20255,6 +20404,24 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
          @touchend="${this._handleTouchEnd}">
             <div class="inner-container">
               ${this._innerContainerContent(this._mime)}
+              <div class="meta-container">
+              <p class="label">${translate$1("Description")}</p>
+              <p>${this._desc}</p>
+              
+              ${this._date?html$1`
+              <p class="label">${translate$1("Date")}</p>
+              <p>${this._date}</p>`:""}
+              
+              ${this._notes.length?html$1`<h4>${translate$1("Notes")}</h4>`:""}
+              ${this._notes.map(n=>html$1`
+              <gr-note-element grampsid=${n}>
+              </gr-note-element>
+              `)}
+              
+              ${this._citations.length?html$1`<h4>${translate$1("Sources")}</h4>`:""}
+              <gr-citations-element .citations=${this._citations}>
+              </gr-citations-element>
+              </div>  
             </div>
         </div>
         ${this._prev?html$1`
@@ -20297,7 +20464,7 @@ store.addReducers({app:app$1});var store$1={saveState:saveState,loadState:loadSt
           <div class="label">${item.name_given} ${item.name_surname}</div>
         </div>
         </a>
-      `})}_handle_left(){this.dispatchEvent(new CustomEvent("media-selected",{bubbles:!0,composed:!0,detail:{selected:this._prev,media:this.media}}))}_handle_right(){this.dispatchEvent(new CustomEvent("media-selected",{bubbles:!0,composed:!0,detail:{selected:this._next,media:this.media}}))}static get styles(){return[SharedStyles]}constructor(){super();this._translateX=0}static get properties(){return{media:{type:Object},handle:{type:String},_rect:{type:Object},_prev:{type:String},_next:{type:String},_translateX:{type:Number},_mime:{type:String}}}firstUpdated(){window.addEventListener("keydown",this._escHandler.bind(this))}_handleTouchStart(e){this._touchStartX=e.touches[0].pageX;this._touchMoveX=this._touchStartX}_handleTouchMove(e){this._touchMoveX=e.touches[0].pageX;this._translateX=this._touchMoveX-this._touchStartX}_handleTouchEnd(e){this._translateX=0;let movedX=this._touchMoveX-this._touchStartX;if(-10>movedX&&""!=this._next){this._handle_right()}else if(10<movedX&&""!=this._prev){this._handle_left()}}_escHandler(e){if("Escape"===e.key){this.dispatchEvent(new CustomEvent("lightbox-opened-changed",{bubbles:!0,composed:!0,detail:{opened:!1}}))}else if(("ArrowRight"===e.key||"Right"===e.key)&&""!=this._next){this._handle_right()}else if(("ArrowLeft"===e.key||"Left"===e.key)&&""!=this._prev){this._handle_left()};}_closeLightbox(){this.dispatchEvent(new CustomEvent("lightbox-opened-changed",{bubbles:!0,composed:!0,detail:{opened:!1}}));this.dispatchEvent(new CustomEvent("medium-selected",{bubbles:!0,composed:!0,detail:{id:""}}))}_getRect(state){var rectangles=[];for(let p in state.api.people){if(state.api.people[p].media!=void 0){for(let m of state.api.people[p].media){if(m.ref==this.handle){rectangles.push({type:"person",gramps_id:state.api.people[p].gramps_id,name_given:state.api.people[p].name_given,name_surname:state.api.people[p].name_surname,rect:m.rect})}}}}return rectangles}stateChanged(state){this._host=state.app.host;this._token=state.api.token;if(state.app.activeMedia!=void 0&&state.api.media){this.media=state.app.activeMedia.media;this.handle=state.app.activeMedia.selected;if(this.handle in state.api.media){this._mime=state.api.media[this.handle].mime}var _prev="",_next="",_handle=this.handle;if(this.media!=void 0&&this.media.length){for(const[index,element]of this.media.entries()){if(element==_handle){if(index+1==this.media.length){_next=""}else{_next=this.media[index+1]}break}_prev=element};};this._prev=_prev;this._next=_next;this._rect=this._getRect(state)}}}window.customElements.define("gr-media-element",MyMediaElement);const INITIAL_STATE$1={people:{},families:{},events:{},places:{},citations:{},sources:{},repositories:{},media:{},strings:{},dbinfo:{},notes:{},token:""},api$1=(state=INITIAL_STATE$1,action)=>{switch(action.type){case TOKEN:return{...state,token:action.token};case NOTE:return{...state,notes:{...state.notes,[action.note.gramps_id]:action.note}};case LOGOUT$1:return INITIAL_STATE$1;case TREE:return{...state,people:action.tree.people,places:action.tree.places,families:action.tree.families,events:action.tree.events,citations:action.tree.citations,sources:action.tree.sources,repositories:action.tree.repositories,media:action.tree.media,dbinfo:action.tree.dbinfo};case STRINGS:return{...state,strings:action.strings.data};default:return state;}};var api$2={default:api$1};class SnackBar extends LitElement{static get properties(){return{active:{type:Boolean}}}static get styles(){return[css`
+      `})}_handle_left(){this.dispatchEvent(new CustomEvent("media-selected",{bubbles:!0,composed:!0,detail:{selected:this._prev,media:this.media}}))}_handle_right(){this.dispatchEvent(new CustomEvent("media-selected",{bubbles:!0,composed:!0,detail:{selected:this._next,media:this.media}}))}static get styles(){return[SharedStyles]}constructor(){super();this._translateX=0}static get properties(){return{media:{type:Object},handle:{type:String},_rect:{type:Object},_prev:{type:String},_next:{type:String},_translateX:{type:Number},_mime:{type:String}}}firstUpdated(){window.addEventListener("keydown",this._escHandler.bind(this))}_handleTouchStart(e){this._touchStartX=e.touches[0].pageX;this._touchMoveX=this._touchStartX}_handleTouchMove(e){this._touchMoveX=e.touches[0].pageX;this._translateX=this._touchMoveX-this._touchStartX}_handleTouchEnd(e){this._translateX=0;let movedX=this._touchMoveX-this._touchStartX;if(-10>movedX&&""!=this._next){this._handle_right()}else if(10<movedX&&""!=this._prev){this._handle_left()}}_escHandler(e){if("Escape"===e.key){this.dispatchEvent(new CustomEvent("lightbox-opened-changed",{bubbles:!0,composed:!0,detail:{opened:!1}}))}else if(("ArrowRight"===e.key||"Right"===e.key)&&""!=this._next){this._handle_right()}else if(("ArrowLeft"===e.key||"Left"===e.key)&&""!=this._prev){this._handle_left()};}_closeLightbox(){this.dispatchEvent(new CustomEvent("lightbox-opened-changed",{bubbles:!0,composed:!0,detail:{opened:!1}}));this.dispatchEvent(new CustomEvent("medium-selected",{bubbles:!0,composed:!0,detail:{id:""}}))}_getRect(state){var rectangles=[];for(let p in state.api.people){if(state.api.people[p].media!=void 0){for(let m of state.api.people[p].media){if(m.ref==this.handle){rectangles.push({type:"person",gramps_id:state.api.people[p].gramps_id,name_given:state.api.people[p].name_given,name_surname:state.api.people[p].name_surname,rect:m.rect})}}}}return rectangles}stateChanged(state){this._host=state.app.host;this._token=state.api.token;if(state.app.activeMedia!=void 0&&state.api.media){this.media=state.app.activeMedia.media;this.handle=state.app.activeMedia.selected;if(this.handle in state.api.media){this._mime=state.api.media[this.handle].mime}this._desc=state.api.media[this.handle].desc;this._citations=state.api.media[this.handle].citations;this._notes=state.api.media[this.handle].notes;this._date=state.api.media[this.handle].date;var _prev="",_next="",_handle=this.handle;if(this.media!=void 0&&this.media.length){for(const[index,element]of this.media.entries()){if(element==_handle){if(index+1==this.media.length){_next=""}else{_next=this.media[index+1]}break}_prev=element};};this._prev=_prev;this._next=_next;this._rect=this._getRect(state)}}}window.customElements.define("gr-media-element",MyMediaElement);const INITIAL_STATE$1={people:{},families:{},events:{},places:{},citations:{},sources:{},repositories:{},media:{},strings:{},dbinfo:{},notes:{},token:""},api$1=(state=INITIAL_STATE$1,action)=>{switch(action.type){case TOKEN:return{...state,token:action.token};case NOTE:return{...state,notes:{...state.notes,[action.note.gramps_id]:action.note}};case LOGOUT$1:return INITIAL_STATE$1;case TREE:return{...state,people:action.tree.people,places:action.tree.places,families:action.tree.families,events:action.tree.events,citations:action.tree.citations,sources:action.tree.sources,repositories:action.tree.repositories,media:action.tree.media,dbinfo:action.tree.dbinfo};case STRINGS:return{...state,strings:action.strings.data};default:return state;}};var api$2={default:api$1};class SnackBar extends LitElement{static get properties(){return{active:{type:Boolean}}}static get styles(){return[css`
         :host {
           display: block;
           position: fixed;
@@ -20631,118 +20798,7 @@ store.dispatch(activePerson(this._mainPerson))}_loadData(host,token){this._loadD
         <vaadin-grid-column path="birthdate" header="${translate$1("Birth Date")}"></vaadin-grid-column>
         <vaadin-grid-column path="deathdate" header="${translate$1("Death Date")}"></vaadin-grid-column>
       </vaadin-grid>
-    `}static get styles(){return[SharedStyles]}static get properties(){return{items:{type:Array}}}firstUpdated(){const grid=this.shadowRoot.querySelector("vaadin-grid");grid.heightByRows=!0}}window.customElements.define("gr-children-element",MyChildrenElement);class MyNoteElement extends connect(store)(LitElement){render(){if(this._note==void 0){return html$1`
-      <p>Loading ...</p>
-      `}if("error"==this._note.content){return html$1`
-      <paper-card>
-        <div class="card-content">
-        <p>Error. <a class="link" @click="${this._reloadNote}">Reload</a></p>
-        </div>
-      </paper-card>
-      `}return html$1`
-      <style>
-      paper-card {
-        margin: 10px 0px;
-        width: 100%;
-      }
-      .card-content p {
-        margin: 1em 0;
-      }
-      .card-content p:first-child {
-        margin-top: 0;
-      }
-      .card-content p:last-child {
-        margin-bottom: 0;
-      }
-      .handle {
-        font-size: 0.8em;
-        background-color: rgba(0, 0, 0, 0.05);
-        padding: 0.3em 0.5em;
-        margin: 0 0.3em;
-        border-radius: 0.5em;
-        font-weight: 500;
-        color: rgba(0, 0, 0, 0.4);
-      }
-      .note-head {
-        margin-bottom: 1em;
-      }
-      .note-head svg {
-        height: 1.5em;
-        top: .42em;
-        position: relative;
-      }
-      .note-head svg path {
-        fill: rgba(0, 0, 0, 0.35);
-      }
-      </style>
-      <paper-card>
-        <div class="card-content">
-          <div class="note-head">
-            ${documentIcon}
-            <span class="handle">${this.grampsid}</span>
-          </div>
-          <div id="note-content"></div>
-        </div>
-      </paper-card>
-      `}static get styles(){return[SharedStyles]}firstUpdated(){}static get properties(){return{grampsid:{type:String},_note:{type:Object}}}connectedCallback(){super.connectedCallback();let state=store.getState();if(state.api.token!=void 0){this.getNote()}}_reloadNote(){this._note=void 0;store.dispatch(loadNote(this._host,this._token,this.grampsid))}getNote(){let state=store.getState();this._host=state.app.host;this._token=state.api.token;store.dispatch(loadNote(this._host,this._token,this.grampsid))}stateChanged(state){if(this._token==void 0){this.getNote()}if(state.api.notes!=void 0&&state.api.notes[this.grampsid]!=void 0){this._note=state.api.notes[this.grampsid];let noteContent=this.shadowRoot.getElementById("note-content");if(noteContent!=void 0){noteContent.innerHTML=this._note.content}}}}window.customElements.define("gr-note-element",MyNoteElement);class MyCitationsElement extends connect(store)(LitElement){render(){var _host=this._host,_token=this._token,_addMimeType=this._addMimeType;let state=store.getState();this._citations=this.citations.map(c=>state.api.citations[c]);this._sources=this.citations.map(c=>state.api.sources[state.api.citations[c].source]);this._sources=[...new Set(this._sources)];// eliminate duplicates
-return html$1`
-      <style>
-      h3 svg {
-        height: 1.6em;
-        top: .46em;
-        position: relative;
-      }
-      h4 svg {
-        height: 2em;
-        top: 0.6em;
-        position: relative;
-      }
-      h3 svg path, h4 svg path {
-        fill: rgba(0, 0, 0, 0.2);
-      }
-      .handle {
-        font-size: 0.8em;
-        background-color: rgba(0, 0, 0, 0.05);
-        padding: 0.3em 0.5em;
-        margin: 0 0.3em;
-        border-radius: 0.5em;
-        font-weight: 500;
-        color: rgba(0, 0, 0, 0.4);
-      }
-      div.citation {
-        margin-left: 1em;
-      }
-      div.citation-content {
-        margin-left: 2em;
-      }
-      </style>
-      ${this._sources.map(source=>html$1`
-      <h3><a href="/source/${source.gramps_id}">${bookIcon} ${source.title}  <span style="font-size:0.5em;top:-0.4em;position:relative;"><span class="handle">${source.gramps_id}</span></span></a>
-      ${source.media.length||source.notes.length?paperclipIcon:""}
-      </h3>
-      ${this._citations.map(function(citation){if(citation.source!=source.gramps_id){return html$1``}return html$1`
-          <div class="citation">
-            <h4>${quoteCloseIcon}  ${citation.page?citation.page:translate$1("Citation")}</h4>
-            <div class="citation-content">
-              ${citation.notes.map(n=>html$1`
-              <gr-note-element grampsid=${n}>
-              </gr-note-element>
-              `)}
-            </div>
-            <div style="clear:left;"></div>
-
-            <div class="citation-content">
-              <gr-gallery-element
-                .images=${_addMimeType(citation.media,store.getState())}
-                host=${_host}
-                token=${_token}>
-              </gr-gallery-element>
-            </div>
-            <div style="clear:left;"></div>
-          </div>
-        `})}
-      `)}
-    `}static get styles(){return[SharedStyles]}firstUpdated(){}static get properties(){return{citations:{type:Array}}}_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token}}window.customElements.define("gr-citations-element",MyCitationsElement);const GridStyles=css`
+    `}static get styles(){return[SharedStyles]}static get properties(){return{items:{type:Array}}}firstUpdated(){const grid=this.shadowRoot.querySelector("vaadin-grid");grid.heightByRows=!0}}window.customElements.define("gr-children-element",MyChildrenElement);const GridStyles=css`
 vaadin-grid-cell-content {
     white-space: normal;
     vertical-align: text-top;
@@ -20896,7 +20952,7 @@ shouldUpdate(){return this.active}static get properties(){return{active:{type:Bo
       ${this.person.deathdate?html$1`&nbsp;&nbsp; ${crossIcon} ${this.person.deathdate}`:""}
       ${this.person.deathplace?html$1` ${translate$1("in")} ${this.person.deathplace}`:""}
       </span>
-      `}static get styles(){return[SharedStyles]}static get properties(){return{person:{type:Array}}}}window.customElements.define("gr-person-element",MyPersonElement);class MyFamilyElement extends connect(store)(LitElement){render(){const state=store.getState();if(!("families"in state.api)){return html$1`Loading...`}this._family=state.api.families[this.gramps_id];if("undefined"!=this._family.marriageplace&&""!=this._family.marriageplace){this._marriageplace_name=state.api.places[this._family.marriageplace].name}this._father=state.api.people[this._family.father_id];this._mother=state.api.people[this._family.mother_id];this._children=this._family.children.map(gid=>state.api.people[gid]);return html$1`
+      `}static get styles(){return[SharedStyles]}static get properties(){return{person:{type:Array}}}}window.customElements.define("gr-person-element",MyPersonElement);class MyFamilyElement extends connect(store)(LitElement){render(){const state=store.getState();if(!("families"in state.api)){return html$1`Loading...`}this._family=state.api.families[this.gramps_id];if("undefined"!=this._family.marriageplace&&""!=this._family.marriageplace){this._marriageplace_name=state.api.places[this._family.marriageplace].name}this._father=state.api.people[this._family.father_id];this._mother=state.api.people[this._family.mother_id];this._children=this._family.children.map(gid=>state.api.people[gid]);this._events=this._family.events.map(h=>state.api.events[h]);this._events=this._events.map(e=>this._get_place_name(state,e));this._media=this._addMimeType(this._family.media,state);this._citations=this._family.citations;this._notes=this._family.notes;return html$1`
       <div style="float:left;">
         <gr-pedigree-card .person=${this._father} width="200px" link="person" host="${this._host}" token="${this._token}"></gr-pedigree-card>
       </div>
@@ -20912,7 +20968,25 @@ shouldUpdate(){return this.active}static get properties(){return{active:{type:Bo
       ${0<this._family.children.length?html$1`
         <h3>${this.siblings?translate$1("Siblings"):translate$1("Children")}</h3>
         <gr-children-element .items="${this._children}"></gr-children-element>`:""}
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._family={};this._father={};this._mother={}}static get properties(){return{gramps_id:{type:String},father:{type:Boolean},mother:{type:Boolean},siblings:{type:Boolean},_family:{type:Object},_father:{type:Object},_mother:{type:Object},_children:{type:Array},_host:{type:String},_token:{type:String}}}stateChanged(state){this._host=state.app.host;this._token=state.api.token}//   if (this._family != undefined) {
+      
+      ${0<this._family.events.length?html$1`<h3>${translate$1("Events")}</h3>
+      <gr-events-element .items="${this._events}" place></gr-events-element>
+      `:""}
+
+      ${this._media.length?html$1`<h3>${translate$1("Media")}</h3>`:""}
+      <gr-gallery-element .images=${this._media} host=${this._host} token=${this._token}>
+      </gr-gallery-element>
+
+      ${this._notes.length?html$1`<h3>${translate$1("Notes")}</h3>`:""}
+      ${this._notes.map(n=>html$1`
+      <gr-note-element grampsid=${n}>
+      </gr-note-element>
+      `)}
+
+      ${this._citations.length?html$1`<h3>${translate$1("Sources")}</h3>`:""}
+      <gr-citations-element .citations=${this._citations}>
+      </gr-citations-element>
+    `}static get styles(){return[SharedStyles]}constructor(){super();this._family={};this._father={};this._mother={}}static get properties(){return{gramps_id:{type:String},father:{type:Boolean},mother:{type:Boolean},siblings:{type:Boolean},_family:{type:Object},_father:{type:Object},_mother:{type:Object},_children:{type:Array},_host:{type:String},_token:{type:String}}}_get_place_name(state,event){if(event.place!=void 0&&""!=event.place&&state.api&&state.api.places){event.place_name=state.api.places[event.place].name};return event}_addMimeType(mhandles,state){return mhandles.map(function(handle){let mobj={ref:handle};mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token}//   if (this._family != undefined) {
 //     this._father = state.api.people[this._family.father_id];
 //     this._mother = state.api.people[this._family.mother_id];
 //     this._children = this._family.children.map((gid) => state.api.people[gid]);

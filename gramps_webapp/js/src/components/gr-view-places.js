@@ -1,6 +1,6 @@
 import{html$2 as html,PageViewElement,SharedStyles,connect,translate,store}from"./gr-app.js";class MyViewPlaces extends connect(store)(PageViewElement){render(){return html`
       <section>
-        <vaadin-grid .items=${this._places} theme="row-dividers" multi-sort>
+        <vaadin-grid class="fullscreen" .items=${this._places} theme="row-dividers" multi-sort>
           <vaadin-grid-selection-column auto-select hidden></vaadin-grid-selection-column>
           <vaadin-grid-column ?hidden="${this._hidden}">
             <template class="header">
