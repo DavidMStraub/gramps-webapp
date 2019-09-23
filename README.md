@@ -27,10 +27,10 @@ The project is still in an early stage. Please use the issue system to report pr
 
 ## Features
 
-- Sortable and filtrable person, family, event, and place list views
+- Sortable and filtrable people, family, event, source, and place list views
 - Map view (based on [Leaflet](https://leafletjs.com/))
 - Ancestor tree view
-- Galleries with full-size previews and linked person tags
+- Galleries with full-size previews and linked person tags, embedded preview for PDFs in Chrome and Firefox
 - Most of the family tree data are cached in the browser, making the app fast after the initial loading
 - Fully internationalized UI (directly using Gramps's translation strings)
 
@@ -62,6 +62,18 @@ You can find the names of the existing databases and their backends with `gramps
 ## Deploying to the web
 
 Instructions will follow.
+
+## Configuration
+
+This is a list of environment variables that affect the web app.
+
+| Variable | Description| 
+|---|---|
+| `TREE` | Family tree to open (can also be set by the `-O` tag on the command line, see above |
+| `PASSWORD` | User password protecting the tree. Empty by default (!) |
+| `JWT_SECRET_KEY` | Secret key for the tokens. If not set, a secure key will be generated, stored in the app's root directory, and reused for the next startup. Note that changing the token will require users to log in again. |
+| `GRAMPS_EXCLUDE_PRIVATE` | Exclude private records from being shown. Defaults to false. |
+| `GRAMPS_EXCLUDE_LIVING` | Do only show names, but no details, of living people. Note that the media objects and events will still be accessible (but not linked to the person). Defaults to false. |
 
 ## Current limitations
 
