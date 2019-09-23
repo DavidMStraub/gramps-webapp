@@ -9,6 +9,8 @@ way of browsing your records on your local computer.
 
 There is a [demo instance](https://agile-bayou-66821.herokuapp.com) using Gramps's example family tree database. Use the password "test".
 
+(NB: initial startup of the demo can take up to a minute since it is hosted on a free Heroku dyno that sleeps after 30 mins of inactivity.)
+
 ## Disclaimers
 
 **:warning: This is experimental software. Back up your data before using this on your own database! :warning:**
