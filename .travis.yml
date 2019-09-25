@@ -7,5 +7,5 @@ python:
 notifications:
   email: false
 
-install:
+script:
   - pip install -e .
