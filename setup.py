@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 import glob
+import os
 
 
 with open('README.md') as f:
@@ -7,6 +8,7 @@ with open('README.md') as f:
 
 
 PACKAGE_DATA = [p[14:] for p in glob.glob('gramps_webapp/js/**/*', recursive=True)]
+PACKAGE_DATA = [f for f in PACKAGE_DATA if os.path.isfile(os.path.join('gramps_webapp', f))]
 
 
 setup(name='gramps-webapp',
