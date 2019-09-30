@@ -13,6 +13,7 @@ from flask import (Flask, current_app, g, jsonify, request, send_file,
 from flask.cli import FlaskGroup
 from flask_caching import Cache
 from flask_cors import CORS
+from flask_compress import Compress
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_restful import Api, Resource, reqparse
 
@@ -73,6 +74,7 @@ def create_app():
     Db(app.config['TREE'])
 
     CORS(app)
+    Compress(app)
     api = Api(app)
     cache = Cache(app, config={'CACHE_TYPE': 'filesystem',
                                'CACHE_DIR': 'appcache'})

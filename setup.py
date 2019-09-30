@@ -26,6 +26,7 @@ setup(name='gramps-webapp',
                         'flask-caching',
                         'flask-jwt-extended',
                         'flask-cors',
+                        'flask-compress',
                         'Pillow',
                         'pdf2image'],
       entry_points={
