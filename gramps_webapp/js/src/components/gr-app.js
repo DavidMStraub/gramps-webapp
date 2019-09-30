@@ -20271,9 +20271,11 @@ return html$1`
       }
       </style>
       ${this._sources.map(source=>html$1`
+      ${this.nosources?"":html$1`
       <h4><a href="/source/${source.gramps_id}">${bookIcon} ${source.title}  <span style="font-size:0.7em;top:-0.2em;position:relative;"><span class="handle">${source.gramps_id}</span></span></a>
       ${source.media.length||source.notes.length?paperclipIcon:""}
       </h4>
+      `}
       ${this._citations.map(function(citation){if(citation.source!=source.gramps_id){return html$1``}return html$1`
           <div class="citation">
             <h5>${quoteCloseIcon}  ${citation.page?citation.page:translate$1("Citation")}</h5>
@@ -20296,7 +20298,7 @@ return html$1`
           </div>
         `})}
       `)}
-    `}static get styles(){return[SharedStyles]}firstUpdated(){}static get properties(){return{citations:{type:Array}}}_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token}}window.customElements.define("gr-citations-element",MyCitationsElement);class MyMediaElement extends connect(store)(LitElement){render(){if(this.media){return html$1`
+    `}static get styles(){return[SharedStyles]}firstUpdated(){}constructor(){super();this.nosources=!1}static get properties(){return{citations:{type:Array},nosources:{type:Boolean}}}_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token}}window.customElements.define("gr-citations-element",MyCitationsElement);class MyMediaElement extends connect(store)(LitElement){render(){if(this.media){return html$1`
         <style>
         div.media-container {
           position: absolute;
