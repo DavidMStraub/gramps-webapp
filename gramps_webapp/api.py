@@ -9,7 +9,7 @@ import secrets
 
 import click
 from flask import (Flask, current_app, g, jsonify, request, send_file,
-                   send_from_directory)
+                   send_from_directory, Response)
 from flask.cli import FlaskGroup
 from flask_caching import Cache
 from flask_cors import CORS
@@ -97,6 +97,10 @@ def create_app():
     @app.route('/')
     def send_js_index():
         return send_from_directory(app.static_folder, 'index.html')
+
+    @app.route('/env.js')
+    def show_env_js():
+        return Response("window.APIHOST = '';\n", content_type='text/javascript')
 
     @app.route('/<path:path>')
     def send_js(path):
