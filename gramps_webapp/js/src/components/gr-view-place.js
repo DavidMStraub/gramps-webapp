@@ -57,7 +57,7 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
         </table>
 
         ${this._media.length?html`<h3>${translate("Media")}</h3>`:""}
-        <gr-gallery-element .images=${this._media} host="${this._host}" token="${this._token}">
+        <gr-gallery-element .images=${this._media} token="${this._token}">
         </gr-gallery-element>
 
 
@@ -90,7 +90,7 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
         
       </section>
 
-    `}static get styles(){return[SharedStyles]}constructor(){super();this._selected=0;this._media=[]}static get properties(){return{_place:{type:Object},_gramps_id:{type:String},_host:{type:String},_token:{type:String},_events:{type:Object},_media:{type:Object},_hierarchy:{type:Object},_selected:{type:Number}}}_handleSelected(ev){this._selected=ev.detail.selected;window.location.hash=this._selected}_onHashChange(ev){this._selected=ev.newURL.split("#")[1]}firstUpdated(){window.addEventListener("hashchange",this._onHashChange);if(window.location.hash.split("#")[1]!=void 0){this._selected=window.location.hash.split("#")[1]}}_personLink(p,lastItem){if(p==void 0){return""}return html`
+    `}static get styles(){return[SharedStyles]}constructor(){super();this._selected=0;this._media=[]}static get properties(){return{_place:{type:Object},_gramps_id:{type:String},_token:{type:String},_events:{type:Object},_media:{type:Object},_hierarchy:{type:Object},_selected:{type:Number}}}_handleSelected(ev){this._selected=ev.detail.selected;window.location.hash=this._selected}_onHashChange(ev){this._selected=ev.newURL.split("#")[1]}firstUpdated(){window.addEventListener("hashchange",this._onHashChange);if(window.location.hash.split("#")[1]!=void 0){this._selected=window.location.hash.split("#")[1]}}_personLink(p,lastItem){if(p==void 0){return""}return html`
       <a href="/person/${p.gramps_id}">${p.name_given}
       ${p.name_surname}</a>${lastItem?"":", "}
       `}// _get_place_name(state, event) {
@@ -99,6 +99,6 @@ import{html$2 as html,PageViewElement,connect,store,translate,SharedStyles}from"
 //   };
 //   return event;
 // }
-_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._host=state.app.host;this._token=state.api.token;this._gramps_id=state.app.activePlace;this._place=state.api.places[this._gramps_id];if(this._place!=void 0){this._media=this._addMimeType(this._place.media,state);this._hierarchy=this._place._hierarchy;this._citations=this._place.citations;this._notes=this._place.notes}// this._events = Object.values(state.api.events).filter((e) => e.place == this._gramps_id);
+_addMimeType(mhandles,state){return mhandles.map(function(mobj){mobj.mime=state.api.media[mobj.ref].mime;return mobj})}stateChanged(state){this._token=state.api.token;this._gramps_id=state.app.activePlace;this._place=state.api.places[this._gramps_id];if(this._place!=void 0){this._media=this._addMimeType(this._place.media,state);this._hierarchy=this._place._hierarchy;this._citations=this._place.citations;this._notes=this._place.notes}// this._events = Object.values(state.api.events).filter((e) => e.place == this._gramps_id);
 // this._events = this._events.map((e) => this._get_place_name(state, e));
 }}window.customElements.define("gr-view-place",MyViewPlace);
