@@ -14,7 +14,9 @@ from flask.cli import FlaskGroup
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_compress import Compress
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token,
+                                jwt_required, jwt_refresh_token_required,
+                                get_jwt_identity)
 from flask_restful import Api, Resource, reqparse
 
 from .db import Db
@@ -118,8 +120,21 @@ def create_app():
             return jsonify({"msg": "Wrong password"}), 401
         expires = datetime.timedelta(days=365)
         access_token = create_access_token(identity='user', expires_delta=expires)
-        return jsonify(access_token=access_token), 200
+        username = 'user'
+        ret = {
+            'access_token': create_access_token(identity=username),
+            'refresh_token': create_refresh_token(identity=username)
+        }
+        return jsonify(ret), 200
 
+    @app.route('/api/refresh', methods=['POST'])
+    @jwt_refresh_token_required
+    def refresh():
+        current_user = get_jwt_identity()
+        ret = {
+            'access_token': create_access_token(identity=current_user)
+        }
+        return jsonify(ret), 200
 
     parser = reqparse.RequestParser()
     parser.add_argument('strings', type=str)
