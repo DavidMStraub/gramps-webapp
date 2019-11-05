@@ -1,4 +1,7 @@
+import logging
 import os
+
+from flask import redirect, send_file
 
 from .image import get_thumbnail, get_thumbnail_cropped
 
@@ -19,13 +22,14 @@ class FileHandler(MediaHandler):
             self.path = os.path.join(base_path, media_info["path"])
 
     def send_file(self):
-        return self.path
+        return send_file(self.path)
 
     def send_thumbnail_square(self, size):
-        return get_thumbnail(self.path, size, square=True, mime=self.mime)
+        f = get_thumbnail(self.path, size, square=True, mime=self.mime)
+        return send_file(f, self.mime)
 
     def send_thumbnail_square_cropped(self, size, x1, y1, x2, y2):
-        return get_thumbnail_cropped(
+        f = get_thumbnail_cropped(
             self.path, size, x1, y1, x2, y2, square=True, mime=self.mime
         )
-
+        return send_file(f, self.mime)

@@ -259,16 +259,14 @@ def create_app():
     @jwt_required
     def show_image(handle):
         handler = get_media_handler(handle)
-        f = handler.send_file()
-        return send_file(f, handler.mime)
+        return handler.send_file()
 
     @app.route('/api/thumbnail/<string:handle>/<int:size>')
     @jwt_required
     @cache.cached()
     def show_thumbnail_square(handle, size):
         handler = get_media_handler(handle)
-        f = handler.send_thumbnail_square(size)
-        return send_file(f, handler.mime)
+        return handler.send_thumbnail_square(size)
 
 
     @app.route('/api/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
@@ -276,8 +274,7 @@ def create_app():
     @cache.cached()
     def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
         handler = get_media_handler(handle)
-        f = handler.send_thumbnail_square_cropped(size, x1, y1, x2, y2)
-        return send_file(f, handler.mime)
+        return handler.send_thumbnail_square_cropped(size, x1, y1, x2, y2)
 
     return app
 
