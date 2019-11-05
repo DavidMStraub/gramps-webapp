@@ -82,6 +82,8 @@ def create_app():
                                'CACHE_DIR': 'appcache'})
 
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'query_string']
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=15)
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
 
     jwt_secret_key = os.getenv('JWT_SECRET_KEY')
     if jwt_secret_key is None:
@@ -118,8 +120,7 @@ def create_app():
         password = request.json.get('password', None)
         if password != app.config['PASSWORD']:
             return jsonify({"msg": "Wrong password"}), 401
-        expires = datetime.timedelta(days=365)
-        access_token = create_access_token(identity='user', expires_delta=expires)
+        username = 'user'
         username = 'user'
         ret = {
             'access_token': create_access_token(identity=username),
