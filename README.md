@@ -78,7 +78,7 @@ This is a list of environment variables that affect the web app.
 ## Current limitations
 
 - No user management
-- Tokens have infinite lifetime (refresh tokens would be more secure)
+- ~~Tokens have infinite lifetime (refresh tokens would be more secure)~~
 - ~~No display of sources, repositories, and notes~~
 - ~~Private records not respected~~
 - Read-only (no family tree editing)
