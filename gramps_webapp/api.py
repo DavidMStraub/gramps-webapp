@@ -25,6 +25,7 @@ from .gramps import (get_db_info, get_events, get_families, get_media_info,
                      get_citations, get_sources, get_repositories,
                      get_note, get_media)
 from .image import get_thumbnail, get_thumbnail_cropped
+from .media import FileHandler
 
 
 def Boolean(v):
@@ -250,32 +251,33 @@ def create_app():
     api.add_resource(FullTree, '/api/tree')
     api.add_resource(Note, '/api/note/<string:gramps_id>')
 
+    def get_media_handler(handle):
+        info = get_media_info(get_db(), handle)
+        return FileHandler(handle, info)
 
     @app.route('/api/media/<string:handle>')
     @jwt_required
     def show_image(handle):
-        path = get_media_info(get_db(), handle)['full_path']
-        return send_file(path)
-
+        handler = get_media_handler(handle)
+        f = handler.send_file()
+        return send_file(f, handler.mime)
 
     @app.route('/api/thumbnail/<string:handle>/<int:size>')
     @jwt_required
     @cache.cached()
     def show_thumbnail_square(handle, size):
-        info = get_media_info(get_db(), handle)
-        tn = get_thumbnail(info['full_path'], size,
-                           square=True, mime=info['mime'])
-        return send_file(tn, info['mime'])
+        handler = get_media_handler(handle)
+        f = handler.send_thumbnail_square(size)
+        return send_file(f, handler.mime)
 
 
     @app.route('/api/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
     @jwt_required
     @cache.cached()
     def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
-        info = get_media_info(get_db(), handle)
-        tn = get_thumbnail_cropped(info['full_path'], size, x1, y1, x2, y2,
-                                   square=True, mime=info['mime'])
-        return send_file(tn, info['mime'])
+        handler = get_media_handler(handle)
+        f = handler.send_thumbnail_square_cropped(size, x1, y1, x2, y2)
+        return send_file(f, handler.mime)
 
     return app
 
