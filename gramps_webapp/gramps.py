@@ -67,7 +67,7 @@ def sanitize(s):
             tags=ALLOWED_TAGS,
             attributes=ALLOWED_ATTRIBUTES,
             styles=ALLOWED_STYLES,
-            strip=False,
+            strip=True,
         )
     return s
 
@@ -75,7 +75,7 @@ def sanitize(s):
 def strip_tags(s):
     """Strip all HTML tags from a string."""
     if isinstance(s, str):
-        return bleach.clean(s, tags=[], attributes=[], strip=False)
+        return bleach.clean(s, tags=[], attributes=[], strip=True)
     return s
 
 
