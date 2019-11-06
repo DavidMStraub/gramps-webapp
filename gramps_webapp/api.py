@@ -25,7 +25,7 @@ from .gramps import (get_db_info, get_events, get_families, get_media_info,
                      get_citations, get_sources, get_repositories,
                      get_note, get_media)
 from .image import get_thumbnail, get_thumbnail_cropped
-from .media import FileHandler
+from .media import FileHandler, S3Handler
 
 
 def Boolean(v):
@@ -69,6 +69,7 @@ def create_app():
     app.config['PASSWORD'] = os.getenv('PASSWORD') or ''
     if not app.config['PASSWORD']:
         logging.warn("The password is empty! The app will not be protected.")
+    app.config['GRAMPS_S3_BUCKET_NAME'] = os.getenv('GRAMPS_S3_BUCKET_NAME')
 
     app.logger.setLevel(logging.INFO)
     app.logger.info("Opening family tree '{}'".format(app.config['TREE']))
@@ -253,7 +254,10 @@ def create_app():
 
     def get_media_handler(handle):
         info = get_media_info(get_db(), handle)
-        return FileHandler(handle, info)
+        if app.config['GRAMPS_S3_BUCKET_NAME']:
+            return S3Handler(handle, info, bucket_name=app.config['GRAMPS_S3_BUCKET_NAME'])
+        else:
+            return FileHandler(handle, info)
 
     @app.route('/api/media/<string:handle>')
     @jwt_required
@@ -285,3 +289,16 @@ def cli(open):
     """Custom CLI command."""
     if open:
         os.environ['TREE'] = open
+
+
+@cli.command('s3')
+@click.option('--bucket', help='S3 bucket name')
+def s3_upload(bucket):
+    """Upload media objects to AWS S3 cloud storage."""
+    logging.warning("Hallo")
+    from .s3 import MediaBucketUploader
+    if not get_db().dbstate.is_open():
+        get_db().open()
+    uploader = MediaBucketUploader(get_db().db, bucket, create=True, logger=current_app.logger)
+    uploader.upload_missing()
+    get_db().close()
