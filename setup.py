@@ -29,7 +29,8 @@ setup(name='gramps-webapp',
                         'flask-compress',
                         'Pillow',
                         'pdf2image',
-                        'boto3'],
+                        'boto3',
+                        'bleach'],
       entry_points={
         'console_scripts': [
             'gramps_webapp=gramps_webapp.api:cli'
