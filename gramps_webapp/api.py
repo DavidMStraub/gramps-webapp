@@ -56,6 +56,27 @@ def close_db(e=None):
         db.close(False)
 
 
+def get_jwt_secret_key(store=True):
+    """Return the JWT secret key.
+    
+    If there is no environment variable 'JWT_SECRET_KEY',
+    a key will be reat from the file 'jwt_secret_key'.
+    If this does not exist, a safe token will be randomly
+    generated. If `store` is True, this generated token
+    will be safed to a file."""
+    jwt_secret_key = os.getenv('JWT_SECRET_KEY')
+    if not jwt_secret_key:
+        if os.path.exists('jwt_secret_key'):
+            with open('jwt_secret_key', 'r') as f:
+                jwt_secret_key = f.read()
+        else:
+            jwt_secret_key = secrets.token_urlsafe(64)
+        if store:
+            with open('jwt_secret_key', 'w') as f:
+                f.write(jwt_secret_key)
+    return jwt_secret_key
+
+
 def create_app():
     """Flask application factory."""
     app = Flask(__name__, static_folder='js')
@@ -87,16 +108,10 @@ def create_app():
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
 
-    jwt_secret_key = os.getenv('JWT_SECRET_KEY')
-    if jwt_secret_key is None:
-        if os.path.exists('jwt_secret_key'):
-            with open('jwt_secret_key', 'r') as f:
-                jwt_secret_key = f.read()
-        else:
-            jwt_secret_key = secrets.token_urlsafe(64)
-    with open('jwt_secret_key', 'w') as f:
-        f.write(jwt_secret_key)
-    app.config['JWT_SECRET_KEY'] = jwt_secret_key
+    if not app.config['PASSWORD']:
+        app.config['JWT_SECRET_KEY'] = '123'
+    else:
+        app.config['JWT_SECRET_KEY'] = get_jwt_secret_key()
 
     jwt = JWTManager(app)
 
