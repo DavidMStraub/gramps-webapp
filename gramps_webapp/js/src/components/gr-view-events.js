@@ -17,7 +17,7 @@ import{html$2 as html,PageViewElement,SharedStyles,connect,translate,store}from"
               <vaadin-grid-filter path="date"></vaadin-grid-filter>
             </template>
             <template>
-              <a href="/event/[[item.handle]]"><div>[[item.date]]</div></a>
+              <a href="/event/[[item.gramps_id]]"><div>[[item.date]]</div></a>
             </template>
           </vaadin-grid-column>
           <vaadin-grid-column>
