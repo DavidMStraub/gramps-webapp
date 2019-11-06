@@ -28,7 +28,8 @@ setup(name='gramps-webapp',
                         'flask-cors',
                         'flask-compress',
                         'Pillow',
-                        'pdf2image'],
+                        'pdf2image',
+                        'boto3'],
       entry_points={
         'console_scripts': [
             'gramps_webapp=gramps_webapp.api:cli'
