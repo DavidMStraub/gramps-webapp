@@ -289,6 +289,19 @@ def get_note_ids(db, x):
     return [db.get_note_from_handle(h).gramps_id for h in x.get_note_list()]
 
 
+def get_event_ids(db, x):
+    """Get the Gramps IDs of events of object x
+    (e.g. person, family, place)"""
+    return [db.get_event_from_handle(r.ref).gramps_id for r in x.get_event_ref_list()]
+
+
+def get_event_ids_roles(db, x):
+    """Get the Gramps ID and role of events of object x"""
+    return [{'gramps_id': db.get_event_from_handle(r.ref).gramps_id,
+             'role': r.get_role().string}
+            for r in x.get_event_ref_list()]
+
+
 def family_to_dict(db, f):
     """Return a dictionary with information about the family."""
     return {
@@ -300,7 +313,7 @@ def family_to_dict(db, f):
     'father_name': get_father_name(db, f),
     'mother_name': get_mother_name(db, f),
     'children': get_children_id(db, f),
-    'events': [r.ref for r in f.get_event_ref_list()],
+    'events': get_event_ids(db, f),
     'media': [r.ref for r in f.get_media_list()],
     'citations': get_citation_ids(db, f),
     'notes': get_note_ids(db, f),
@@ -320,7 +333,7 @@ def person_to_dict(db, p):
     'deathplace': get_deathplace(db, p),
     'parents': get_parents_id(db, p),
     'families': get_families_id(db, p),
-    'events': [{'ref': r.ref, 'role': r.get_role().string} for r in p.get_event_ref_list()],
+    'events': get_event_ids_roles(db, p),
     'media': [{'ref': r.ref, 'rect': r.rect} for r in p.get_media_list()],
     'citations': get_citation_ids(db, p),
     'notes': get_note_ids(db, p),
@@ -444,7 +457,7 @@ def get_families(tree):
 def get_events(tree):
     """Return a nested dictionary with information about all the events."""
     db = tree.db
-    return {e.handle: event_to_dict(db, e) for e in db.iter_events()}
+    return {e.gramps_id: event_to_dict(db, e) for e in db.iter_events()}
 
 def get_places(tree):
     """Return a nested dictionary with information about all the places."""
