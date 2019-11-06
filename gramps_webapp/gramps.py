@@ -3,21 +3,80 @@
 
 import os
 
+import bleach
 from gramps.gen.const import GRAMPS_LOCALE
 from gramps.gen.display.name import NameDisplay
 from gramps.gen.display.place import displayer as place_displayer
+from gramps.gen.lib import NoteType
 from gramps.gen.utils.db import get_marriage_or_fallback
 from gramps.gen.utils.file import expand_media_path
 from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
-from gramps.plugins.lib.libhtmlbackend import HtmlBackend, process_spaces
 from gramps.plugins.lib.libhtml import Html
-from gramps.gen.lib import NoteType
-
+from gramps.plugins.lib.libhtmlbackend import HtmlBackend, process_spaces
 
 nd = NameDisplay()
 dd = GRAMPS_LOCALE.date_displayer
 _ = GRAMPS_LOCALE.translation.sgettext
+
+
+
+ALLOWED_TAGS = [
+    "a",
+    "abbr",
+    "acronym",
+    "b",
+    "blockquote",
+    "code",
+    "em",
+    "i",
+    "li",
+    "ol",
+    "strong",
+    "ul",
+    "span",
+    "p",
+    "br",
+    "div",
+]
+ALLOWED_ATTRIBUTES = {
+    "a": ["href", "title", "style"],
+    "abbr": ["title", "style"],
+    "acronym": ["title", "style"],
+    "p": ["style"],
+    "div": ["style"],
+    "span": ["style"],
+}
+ALLOWED_STYLES = [
+    "color",
+    "background-color",
+    "font-family",
+    "font-weight",
+    "font-size",
+    "font-style",
+    "text-decoration",
+]
+
+
+def sanitize(s):
+    """Sanitize an HTML string by keeping only a couple of allowed
+    tags/attributes."""
+    if isinstance(s, str):
+        return bleach.clean(
+            s,
+            tags=ALLOWED_TAGS,
+            attributes=ALLOWED_ATTRIBUTES,
+            styles=ALLOWED_STYLES,
+            strip=False,
+        )
+    return s
+
+
+def strip_tags(s):
+    """Strip all HTML tags from a string."""
+    if isinstance(s, str):
+        return bleach.clean(s, tags=[], attributes=[], strip=False)
+    return s
 
 
 def get_birthplace(db, p):
@@ -430,7 +489,6 @@ def get_media_info(tree, handle):
         'mime': m.mime,
         'path': m.path,
         'full_path': os.path.join(base_path, m.path),
-
     }
 
 
@@ -443,12 +501,12 @@ def get_note(tree, gramps_id, fmt='html'):
     note = db.get_note_from_gramps_id(gramps_id)
     note_type = note.type.string
     if fmt == 'text' or fmt is None:
-        return str(note.text)
+        return strip_tags(str(note.text))
     elif fmt == 'html':
         htmlnotetext = styled_note(note.get_styledtext(),
                                 note.get_format(),
                                 contains_html=(note.get_type() == NoteType.HTML_CODE))
-        return {'type': note_type, 'content': htmlnotetext, 'gramps_id': gramps_id}
+        return {'type': note_type, 'content': sanitize(htmlnotetext), 'gramps_id': gramps_id}
     raise ValueError("Format {} not recognized.".format(fmt))
 
 
