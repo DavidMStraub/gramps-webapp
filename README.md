@@ -33,6 +33,7 @@ The project is still in an early stage. Please use the issue system to report pr
 - Galleries with full-size previews and linked person tags, embedded preview for PDFs in Chrome and Firefox
 - Most of the family tree data are cached in the browser, making the app fast after the initial loading
 - Fully internationalized UI (directly using Gramps's translation strings)
+- Optionally host media objects on Amazon S3 cloud storage ([docs](https://github.com/DavidMStraub/gramps-webapp/wiki/Storing-media-objects-on-S3))
 
 ## Installation
 
