@@ -19,6 +19,7 @@ from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_
                                 get_jwt_identity)
 from flask_restful import Api, Resource, reqparse
 
+from .auth import SingleUser
 from .db import Db
 from .gramps import (get_db_info, get_events, get_families, get_media_info,
                      get_people, get_places, get_translation,
@@ -130,15 +131,16 @@ def create_app():
         else:
             return send_from_directory(app.static_folder, 'index.html')
 
+    auth_provider = SingleUser(password=app.config['PASSWORD'])
+
     @app.route('/api/login', methods=['POST'])
     def login():
         if not request.is_json:
             return jsonify({"msg": "Missing JSON in request"}), 400
+        username = request.json.get('username', None)
         password = request.json.get('password', None)
-        if password != app.config['PASSWORD']:
-            return jsonify({"msg": "Wrong password"}), 401
-        username = 'user'
-        username = 'user'
+        if not auth_provider.authorized(username, password):
+            return jsonify({"msg": "Wrong username or password"}), 401
         ret = {
             'access_token': create_access_token(identity=username),
             'refresh_token': create_refresh_token(identity=username)
