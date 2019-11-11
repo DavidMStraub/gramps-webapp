@@ -3,9 +3,19 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
+  - "3.8"
+matrix:
+  allow_failures:
+    - python: "3.5"
+    - python: "3.8"
 
 notifications:
   email: false
 
-script:
+install:
   - pip install -e .
+  - pip install nose coveralls
+
+script: nosetests --with-coverage --cover-package=gramps_webapp
+
+after_success: coveralls
