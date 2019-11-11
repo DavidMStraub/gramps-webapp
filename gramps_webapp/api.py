@@ -10,7 +10,7 @@ import secrets
 import click
 from flask import (Flask, current_app, g, jsonify, request, send_file,
                    send_from_directory, Response)
-from flask.cli import FlaskGroup
+from flask.cli import FlaskGroup, AppGroup
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_compress import Compress
@@ -19,7 +19,7 @@ from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_
                                 get_jwt_identity)
 from flask_restful import Api, Resource, reqparse
 
-from .auth import SingleUser
+from .auth import SingleUser, SQLAuth
 from .db import Db
 from .gramps import (get_db_info, get_events, get_families, get_media_info,
                      get_people, get_places, get_translation,
@@ -57,6 +57,10 @@ def close_db(e=None):
         db.close(False)
 
 
+def get_auth():
+    """Get the appropriate instance of the `AuthProvider` class."""
+    return SQLAuth(db_uri=os.getenv('GRAMPS_USER_DB_URI'), logging=False)
+
 def get_jwt_secret_key(store=True):
     """Return the JWT secret key.
     
@@ -89,6 +93,7 @@ def create_app():
     if app.config['TREE'] is None or app.config['TREE'] == '':
         raise ValueError("You have to set the `TREE` environment variable.")
     app.config['PASSWORD'] = os.getenv('PASSWORD') or ''
+    app.config['GRAMPS_USER_DB_URI'] = os.getenv('GRAMPS_USER_DB_URI') or ''
     if not app.config['PASSWORD']:
         logging.warn("The password is empty! The app will not be protected.")
     app.config['GRAMPS_S3_BUCKET_NAME'] = os.getenv('GRAMPS_S3_BUCKET_NAME')
@@ -108,11 +113,7 @@ def create_app():
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'query_string']
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
-
-    if not app.config['PASSWORD']:
-        app.config['JWT_SECRET_KEY'] = '123'
-    else:
-        app.config['JWT_SECRET_KEY'] = get_jwt_secret_key()
+    app.config['JWT_SECRET_KEY'] = get_jwt_secret_key()
 
     jwt = JWTManager(app)
 
@@ -131,7 +132,7 @@ def create_app():
         else:
             return send_from_directory(app.static_folder, 'index.html')
 
-    auth_provider = SingleUser(password=app.config['PASSWORD'])
+    auth_provider = get_auth()
 
     @app.route('/api/login', methods=['POST'])
     def login():
