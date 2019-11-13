@@ -53,12 +53,11 @@ It will only work with SQLite databases (not with BSDDB).
 After installation, run
 
 ```
-gramps_webapp -O 'My family tree' run --without-threads
+python3 -m gramps_webapp app -O 'My family tree' run
 ```
 
 You can find the names of the existing databases and their backends with `gramps -L`.
 
-(NB: single-threaded running is currently necessary because of Gramps's restrictive database locking.)
 
 ## Deploying to the web
 
