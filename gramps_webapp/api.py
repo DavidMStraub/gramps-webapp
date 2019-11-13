@@ -57,11 +57,6 @@ def close_db(e=None):
         db.close(False)
 
 
-def get_auth():
-    """Get the appropriate instance of the `AuthProvider` class."""
-    # return SQLAuth(db_uri=os.getenv('GRAMPS_USER_DB_URI'), logging=False)
-    return SingleUser(os.getenv('PASSWORD', ''))
-
 def get_jwt_secret_key(store=True):
     """Return the JWT secret key.
     
@@ -93,10 +88,7 @@ def create_app():
     app.config['TREE'] = os.getenv('TREE')
     if app.config['TREE'] is None or app.config['TREE'] == '':
         raise ValueError("You have to set the `TREE` environment variable.")
-    app.config['PASSWORD'] = os.getenv('PASSWORD') or ''
     app.config['GRAMPS_USER_DB_URI'] = os.getenv('GRAMPS_USER_DB_URI') or ''
-    if not app.config['PASSWORD']:
-        logging.warn("The password is empty! The app will not be protected.")
     app.config['GRAMPS_S3_BUCKET_NAME'] = os.getenv('GRAMPS_S3_BUCKET_NAME')
 
     app.logger.setLevel(logging.INFO)
@@ -133,7 +125,7 @@ def create_app():
         else:
             return send_from_directory(app.static_folder, 'index.html')
 
-    auth_provider = get_auth()
+    auth_provider = SQLAuth(db_uri=app.config['GRAMPS_USER_DB_URI'])
 
     @app.route('/api/login', methods=['POST'])
     def login():
@@ -141,6 +133,8 @@ def create_app():
             return jsonify({"msg": "Missing JSON in request"}), 400
         username = request.json.get('username', None)
         password = request.json.get('password', None)
+        from .auth import User
+        logging.error(auth_provider.session.query(User).all())
         if not auth_provider.authorized(username, password):
             return jsonify({"msg": "Wrong username or password"}), 401
         ret = {
