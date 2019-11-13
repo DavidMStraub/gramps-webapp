@@ -54,5 +54,23 @@ def s3_upload(ctx):
         get_db().close()
 
 
+@cli.group("user")
+def user():
+    pass
+
+
+@user.command("add")
+@click.argument("db")
+@click.argument("name")
+@click.argument("password"  )
+@click.option("--fullname", help="Full name", default="")
+@click.option("--email", help="E-mail address", default=None)
+def user_add(db, name, password, fullname, email):
+    from .auth import SQLAuth
+
+    auth = SQLAuth(db_uri=db, logging=False)
+    auth.add_user(name, password, fullname, email)
+
+
 if __name__ == "__main__":
     cli()
