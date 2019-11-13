@@ -58,7 +58,7 @@ class SQLAuth(AuthProvider):
         if name == "":
             raise ValueError("Username must not be empty")
         pwhash = self.hash_password(password)
-        user = User(id=uuid.uuid4(), name=name, fullname=fullname, pwhash=pwhash)
+        user = User(id=uuid.uuid4(), name=name, fullname=fullname, email=email, pwhash=pwhash)
         if self.session.query(sqlalchemy.exists().where(User.name == name)).scalar():
             raise ValueError("Username {} already exists".format(name))
         if email and self.session.query(sqlalchemy.exists().where(User.email == email)).scalar():
@@ -74,24 +74,24 @@ class SQLAuth(AuthProvider):
             raise ValueError("User {} not found".format(name))
         return user.id
 
-    def delete_user(self, guid, commit=True):
+    def delete_user(self, name, commit=True):
         """Delete an existing user."""
-        user = self.session.query(User).filter_by(id=guid).scalar()
+        user = self.session.query(User).filter_by(name=name).scalar()
         if user is None:
-            raise ValueError("User with GUID {} not found".format(guid))
+            raise ValueError("User {} not found".format(name))
         self.session.delete(user)
         if commit:
             self.session.commit()
 
     def modify_user(
-        self, guid, name=None, password=None, fullname=None, email=None, commit=True
+        self, name, name_new=None, password=None, fullname=None, email=None, commit=True
     ):
         """Modify an existing user."""
-        user = self.session.query(User).filter_by(id=guid).scalar()
+        user = self.session.query(User).filter_by(name=name).scalar()
         if user is None:
-            raise ValueError("User with GUID {} not found".format(guid))
-        if name is not None:
-            user.name = name
+            raise ValueError("User not found".format(name))
+        if name_new is not None:
+            user.name = name_new
         if password is not None:
             user.pwhash = self.hash_password(password)
         if fullname is not None:
