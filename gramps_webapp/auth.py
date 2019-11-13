@@ -43,16 +43,16 @@ Base = declarative_base()
 class SQLAuth(AuthProvider):
     """SQL Alchemy user database."""
 
-    def __init__(self, db_uri, logging=True):
+    def __init__(self, db_uri, logging=False):
         super().__init__()
         self.db_uri = db_uri
         self.engine = sqlalchemy.create_engine(db_uri, echo=logging)
-        Base.metadata.create_all(bind=self.engine)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
     def add_user(self, name, password, fullname="", email=None, commit=True):
         """Add a user."""
+        Base.metadata.create_all(bind=self.engine)  # create table if not exists
         if password == "":
             raise ValueError("Password must not be empty")
         if name == "":
