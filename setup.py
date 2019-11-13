@@ -30,10 +30,6 @@ setup(name='gramps-webapp',
                         'Pillow',
                         'pdf2image',
                         'boto3',
-                        'bleach'],
-      entry_points={
-        'console_scripts': [
-            'gramps_webapp=gramps_webapp.api:cli'
-        ],
-      },
+                        'bleach',
+                        'sqlalchemy'],
 )

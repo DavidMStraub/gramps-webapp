@@ -51,7 +51,7 @@ class SQLAuth(AuthProvider):
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def add_user(self, name, password, fullname="", commit=True):
+    def add_user(self, name, password, fullname="", email=None, commit=True):
         """Add a user."""
         if password == "":
             raise ValueError("Password must not be empty")
@@ -61,6 +61,8 @@ class SQLAuth(AuthProvider):
         user = User(id=uuid.uuid4(), name=name, fullname=fullname, pwhash=pwhash)
         if self.session.query(sqlalchemy.exists().where(User.name == name)).scalar():
             raise ValueError("Username {} already exists".format(name))
+        if email and self.session.query(sqlalchemy.exists().where(User.email == email)).scalar():
+            raise ValueError("A user with this e-mail address already exists")
         self.session.add(user)
         if commit:
             self.session.commit()
@@ -81,7 +83,9 @@ class SQLAuth(AuthProvider):
         if commit:
             self.session.commit()
 
-    def modify_user(self, guid, name=None, password=None, fullname=None, commit=True):
+    def modify_user(
+        self, guid, name=None, password=None, fullname=None, email=None, commit=True
+    ):
         """Modify an existing user."""
         user = self.session.query(User).filter_by(id=guid).scalar()
         if user is None:
@@ -92,6 +96,7 @@ class SQLAuth(AuthProvider):
             user.pwhash = self.hash_password(password)
         if fullname is not None:
             user.fullname = fullname
+        user.email = email  # also for None since nullable
         if commit:
             self.session.commit()
 
@@ -133,7 +138,8 @@ class User(Base):
     __tablename__ = "users"
 
     id = sqlalchemy.Column(GUID, primary_key=True)
-    name = sqlalchemy.Column(sqlalchemy.String)
+    name = sqlalchemy.Column(sqlalchemy.String, unique=True)
+    email = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=True)
     fullname = sqlalchemy.Column(sqlalchemy.String)
     pwhash = sqlalchemy.Column(sqlalchemy.String)
 

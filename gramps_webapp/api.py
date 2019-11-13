@@ -59,7 +59,8 @@ def close_db(e=None):
 
 def get_auth():
     """Get the appropriate instance of the `AuthProvider` class."""
-    return SQLAuth(db_uri=os.getenv('GRAMPS_USER_DB_URI'), logging=False)
+    # return SQLAuth(db_uri=os.getenv('GRAMPS_USER_DB_URI'), logging=False)
+    return SingleUser(os.getenv('PASSWORD', ''))
 
 def get_jwt_secret_key(store=True):
     """Return the JWT secret key.
@@ -226,7 +227,7 @@ def create_app():
 
 
     class FullTree(ProtectedResource):
-        @cache.cached()
+        @cache.cached()        
         def get(self):
             return {
                 'people': get_people(get_db()),
@@ -299,24 +300,3 @@ def create_app():
         return handler.send_thumbnail_square_cropped(size, x1, y1, x2, y2)
 
     return app
-
-
-@click.group(cls=FlaskGroup, create_app=create_app)
-@click.option('-O', '--open', help='Family tree to use')
-def cli(open):
-    """Custom CLI command."""
-    if open:
-        os.environ['TREE'] = open
-
-
-@cli.command('s3')
-@click.option('--bucket', help='S3 bucket name')
-def s3_upload(bucket):
-    """Upload media objects to AWS S3 cloud storage."""
-    logging.warning("Hallo")
-    from .s3 import MediaBucketUploader
-    if not get_db().dbstate.is_open():
-        get_db().open()
-    uploader = MediaBucketUploader(get_db().db, bucket, create=True, logger=current_app.logger)
-    uploader.upload_missing()
-    get_db().close()

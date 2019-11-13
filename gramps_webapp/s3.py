@@ -25,10 +25,29 @@ class MediaBucketUploader:
         self.client = boto3.client("s3")
         self.logger = logger or logging.getLogger()
         if create:
-            self.logger.info("Creating bucket {} if it does not exist".format(bucket_name))
-            self.client.create_bucket(Bucket=bucket_name)
+            if self.bucket_exists:
+                self.logger.info("Bucket {} already exists".format(bucket_name))
+            else:
+                self.logger.info("Creating bucket {}".format(bucket_name))
+                region_name = boto3.session.Session().region_name
+                bucket_config = {}
+                if region_name:
+                    bucket_config = {"LocationConstraint": region_name}
+                self.client.create_bucket(
+                    Bucket=bucket_name, CreateBucketConfiguration=bucket_config
+                )
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.base_path = expand_media_path(self.db.get_mediapath(), self.db)
+
+    @property
+    def bucket_exists(self):
+        try:
+            self.client.head_bucket(Bucket=self.bucket_name)
+        except ClientError as e:
+            error_code = int(e.response["Error"]["Code"])
+            if error_code == 404:  # bucket does not exist
+                return False
+        return True
 
     def get_remote_handles(self):
         """Get a set of all names of objects (media handles) in the bucket."""
@@ -71,6 +90,8 @@ class MediaBucketUploader:
         N = len(missing)
         self.logger.info("Found {} objects to upload.".format(N))
         for i, handle in enumerate(missing):
-            self.logger.info("Uploading file {} of {} ({}%)".format(i + 1, N, round(100 * i / N)))
+            self.logger.info(
+                "Uploading file {} of {} ({}%)".format(i + 1, N, round(100 * i / N))
+            )
             mime = local_handles_dict[handle]
             self.upload(handle, mime)
