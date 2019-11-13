@@ -55,21 +55,30 @@ def s3_upload(ctx):
 
 
 @cli.group("user")
-def user():
-    pass
+@click.argument("db")
+@click.pass_context
+def user(ctx, db):
+    from .auth import SQLAuth
+    ctx.obj = SQLAuth(db_uri=db, logging=False)
 
 
 @user.command("add")
-@click.argument("db")
 @click.argument("name")
 @click.argument("password"  )
 @click.option("--fullname", help="Full name", default="")
 @click.option("--email", help="E-mail address", default=None)
-def user_add(db, name, password, fullname, email):
-    from .auth import SQLAuth
-
-    auth = SQLAuth(db_uri=db, logging=False)
+@click.pass_context
+def user_add(ctx, name, password, fullname, email):
+    auth = ctx.obj
     auth.add_user(name, password, fullname, email)
+
+
+@user.command("delete")
+@click.argument("name")
+@click.pass_context
+def user_del(ctx, name):
+    auth = ctx.obj
+    auth.delete_user(name)
 
 
 if __name__ == "__main__":
