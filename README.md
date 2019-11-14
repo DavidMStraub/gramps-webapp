@@ -22,7 +22,7 @@ The project is still in an early stage. Please use the issue system to report pr
 ## Technologies used
 
 - REST API to the Gramps database based on [Flask](https://palletsprojects.com/p/flask/) and [Flask-RESTful](https://flask-restful.readthedocs.io/) and directly using the Gramps Python package
-- Password protection using JSON web tokens (using [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/))
+- Authentication system using JSON web tokens (using [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/))
 - Progressive web app frontend based on [PWA Starter Kit](https://pwa-starter-kit.polymer-project.org/)
 
 ## Features
@@ -34,6 +34,7 @@ The project is still in an early stage. Please use the issue system to report pr
 - Most of the family tree data are cached in the browser, making the app fast after the initial loading
 - Fully internationalized UI (directly using Gramps's translation strings)
 - Optionally host media objects on Amazon S3 cloud storage ([docs](https://github.com/DavidMStraub/gramps-webapp/wiki/Storing-media-objects-on-S3))
+- Optionally manage users in a separate SQL database ([docs](https://github.com/DavidMStraub/gramps-webapp/wiki/Managing-users))
 
 ## Installation
 
@@ -70,14 +71,18 @@ This is a list of environment variables that affect the web app.
 | Variable | Description| 
 |---|---|
 | `TREE` | Family tree to open (can also be set by the `-O` tag on the command line, see above |
-| `PASSWORD` | User password protecting the tree. Empty by default (!) |
 | `JWT_SECRET_KEY` | Secret key for the tokens. If not set, a secure key will be generated, stored in the app's root directory, and reused for the next startup. Note that changing the token will require users to log in again. |
 | `GRAMPS_EXCLUDE_PRIVATE` | Exclude private records from being shown. Defaults to false. |
 | `GRAMPS_EXCLUDE_LIVING` | Do only show names, but no details, of living people. Note that the media objects and events will still be accessible (but not linked to the person). Defaults to false. |
+| `GRAMPS_AUTH_PROVIDER` | Authentication method to use. Possible values: `password` or `sql` (default). |
+| `PASSWORD` | User password in case of using password authentication. Empty by default (!) |
+| `GRAMPS_USER_DB_URI` | SQLAlchemy compatible URI for the user database when using SQL authentication. |
+| `GRAMPS_S3_BUCKET_NAME` | S3 bucket name when using AWS cloud storage for media files. See [the documentation](https://github.com/DavidMStraub/gramps-webapp/wiki/Storing-media-objects-on-S3) for details. |
+
 
 ## Current limitations
 
-- No user management
+- ~~No user management~~
 - ~~Tokens have infinite lifetime (refresh tokens would be more secure)~~
 - ~~No display of sources, repositories, and notes~~
 - ~~Private records not respected~~
