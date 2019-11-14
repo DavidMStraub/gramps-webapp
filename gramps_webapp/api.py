@@ -88,8 +88,14 @@ def create_app():
     app.config['TREE'] = os.getenv('TREE')
     if app.config['TREE'] is None or app.config['TREE'] == '':
         raise ValueError("You have to set the `TREE` environment variable.")
-    app.config['GRAMPS_USER_DB_URI'] = os.getenv('GRAMPS_USER_DB_URI') or ''
     app.config['GRAMPS_S3_BUCKET_NAME'] = os.getenv('GRAMPS_S3_BUCKET_NAME')
+    app.config['PASSWORD'] = os.getenv('PASSWORD', '')
+    app.config['GRAMPS_USER_DB_URI'] = os.getenv('GRAMPS_USER_DB_URI', '')
+
+    if os.getenv('GRAMPS_AUTH_PROVIDER') == 'password':
+        auth_provider = SingleUser(password=app.config['PASSWORD'])
+    else:
+        auth_provider = SQLAuth(db_uri=app.config['GRAMPS_USER_DB_URI'])
 
     app.logger.setLevel(logging.INFO)
     app.logger.info("Opening family tree '{}'".format(app.config['TREE']))
@@ -125,7 +131,6 @@ def create_app():
         else:
             return send_from_directory(app.static_folder, 'index.html')
 
-    auth_provider = SQLAuth(db_uri=app.config['GRAMPS_USER_DB_URI'])
 
     @app.route('/api/login', methods=['POST'])
     def login():
