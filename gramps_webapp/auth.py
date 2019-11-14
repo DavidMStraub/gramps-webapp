@@ -89,7 +89,7 @@ class SQLAuth(AuthProvider):
         """Modify an existing user."""
         user = self.session.query(User).filter_by(name=name).scalar()
         if user is None:
-            raise ValueError("User not found".format(name))
+            raise ValueError("User {} not found".format(name))
         if name_new is not None:
             user.name = name_new
         if password is not None:
