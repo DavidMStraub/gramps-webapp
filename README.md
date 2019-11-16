@@ -54,10 +54,10 @@ It will only work with SQLite databases (not with BSDDB).
 After installation, run
 
 ```
-python3 -m gramps_webapp app -O 'My family tree' run
+python3 -m gramps_webapp app -O 'My family tree' --no-auth run
 ```
 
-You can find the names of the existing databases and their backends with `gramps -L`.
+The `--no-auth` option disables the user system (the login form will still be shown but can be left empty). You can find the names of the existing databases and their backends with `gramps -L`.
 
 
 ## Deploying to the web
