@@ -7,7 +7,7 @@ way of browsing your records on your local computer.
 
 ## Demo
 
-There is a [demo instance](https://agile-bayou-66821.herokuapp.com) using Gramps's example family tree database. Use the password "test".
+There is a [demo instance](https://agile-bayou-66821.herokuapp.com) using Gramps's example family tree database. Use "test" for user and password.
 
 (NB: initial startup of the demo can take up to a minute since it is hosted on a free Heroku dyno that sleeps after 30 mins of inactivity.)
 
