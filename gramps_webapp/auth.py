@@ -4,7 +4,7 @@ import hashlib
 import os
 import uuid
 
-import sqlalchemy
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -46,11 +46,11 @@ class SQLAuth(AuthProvider):
     def __init__(self, db_uri, logging=False):
         super().__init__()
         self.db_uri = db_uri
-        self.engine = sqlalchemy.create_engine(db_uri, echo=logging)
+        self.engine = sa.create_engine(db_uri, echo=logging)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def add_user(self, name, password, fullname="", email=None, commit=True):
+    def add_user(self, name, password, fullname="", email=None, role=None, commit=True):
         """Add a user."""
         Base.metadata.create_all(bind=self.engine)  # create table if not exists
         if password == "":
@@ -58,10 +58,20 @@ class SQLAuth(AuthProvider):
         if name == "":
             raise ValueError("Username must not be empty")
         pwhash = self.hash_password(password)
-        user = User(id=uuid.uuid4(), name=name, fullname=fullname, email=email, pwhash=pwhash)
-        if self.session.query(sqlalchemy.exists().where(User.name == name)).scalar():
+        user = User(
+            id=uuid.uuid4(),
+            name=name,
+            fullname=fullname,
+            email=email,
+            pwhash=pwhash,
+            role=role,
+        )
+        if self.session.query(sa.exists().where(User.name == name)).scalar():
             raise ValueError("Username {} already exists".format(name))
-        if email and self.session.query(sqlalchemy.exists().where(User.email == email)).scalar():
+        if (
+            email
+            and self.session.query(sa.exists().where(User.email == email)).scalar()
+        ):
             raise ValueError("A user with this e-mail address already exists")
         self.session.add(user)
         if commit:
@@ -84,7 +94,14 @@ class SQLAuth(AuthProvider):
             self.session.commit()
 
     def modify_user(
-        self, name, name_new=None, password=None, fullname=None, email=None, commit=True
+        self,
+        name,
+        name_new=None,
+        password=None,
+        fullname=None,
+        email=None,
+        role=None,
+        commit=True,
     ):
         """Modify an existing user."""
         user = self.session.query(User).filter_by(name=name).scalar()
@@ -97,6 +114,8 @@ class SQLAuth(AuthProvider):
         if fullname is not None:
             user.fullname = fullname
         user.email = email  # also for None since nullable
+        if role is not None:
+            user.role = role
         if commit:
             self.session.commit()
 
@@ -133,15 +152,16 @@ class SQLAuth(AuthProvider):
 
 
 class User(Base):
-    """User table class for SQLAlchemy."""
+    """User table class for sa."""
 
     __tablename__ = "users"
 
-    id = sqlalchemy.Column(GUID, primary_key=True)
-    name = sqlalchemy.Column(sqlalchemy.String, unique=True)
-    email = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=True)
-    fullname = sqlalchemy.Column(sqlalchemy.String)
-    pwhash = sqlalchemy.Column(sqlalchemy.String)
+    id = sa.Column(GUID, primary_key=True)
+    name = sa.Column(sa.String, unique=True)
+    email = sa.Column(sa.String, unique=True, nullable=True)
+    fullname = sa.Column(sa.String)
+    pwhash = sa.Column(sa.String)
+    role = sa.Column(sa.Integer, default=0)
 
     def __repr__(self):
         return "<User(name='%s', fullname='%s')>" % (self.name, self.fullname)
