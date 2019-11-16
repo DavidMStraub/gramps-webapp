@@ -152,7 +152,7 @@ class SQLAuth(AuthProvider):
 
 
 class User(Base):
-    """User table class for sa."""
+    """User table class for sqlalchemy."""
 
     __tablename__ = "users"
 

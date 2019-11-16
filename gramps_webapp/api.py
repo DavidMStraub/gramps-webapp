@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import secrets
+from functools import wraps
 
 import click
 from flask import (Flask, current_app, g, jsonify, request, send_file,
@@ -16,7 +17,8 @@ from flask_cors import CORS
 from flask_compress import Compress
 from flask_jwt_extended import (JWTManager, create_access_token, create_refresh_token,
                                 jwt_required, jwt_refresh_token_required,
-                                get_jwt_identity)
+                                get_jwt_identity, verify_jwt_in_request,
+                                verify_jwt_refresh_token_in_request)
 from flask_restful import Api, Resource, reqparse
 
 from .auth import SingleUser, SQLAuth
@@ -91,9 +93,12 @@ def create_app():
     app.config['GRAMPS_S3_BUCKET_NAME'] = os.getenv('GRAMPS_S3_BUCKET_NAME')
     app.config['PASSWORD'] = os.getenv('PASSWORD', '')
     app.config['GRAMPS_USER_DB_URI'] = os.getenv('GRAMPS_USER_DB_URI', '')
+    app.config['GRAMPS_AUTH_PROVIDER'] = os.getenv('GRAMPS_AUTH_PROVIDER', '')
 
-    if os.getenv('GRAMPS_AUTH_PROVIDER') == 'password':
+    if app.config['GRAMPS_AUTH_PROVIDER'] == 'password':
         auth_provider = SingleUser(password=app.config['PASSWORD'])
+    elif app.config['GRAMPS_AUTH_PROVIDER'] == 'none':
+        auth_provider = None
     else:
         auth_provider = SQLAuth(db_uri=app.config['GRAMPS_USER_DB_URI'])
 
@@ -134,12 +139,14 @@ def create_app():
 
     @app.route('/api/login', methods=['POST'])
     def login():
+        if app.config['GRAMPS_AUTH_PROVIDER'] == 'none':
+            ret = { 'access_token': '1', 'refresh_token': '1' }
+            return jsonify(ret), 200
         if not request.is_json:
             return jsonify({"msg": "Missing JSON in request"}), 400
         username = request.json.get('username', None)
         password = request.json.get('password', None)
         from .auth import User
-        logging.error(auth_provider.session.query(User).all())
         if not auth_provider.authorized(username, password):
             return jsonify({"msg": "Wrong username or password"}), 401
         ret = {
@@ -148,9 +155,30 @@ def create_app():
         }
         return jsonify(ret), 200
 
+    def jwt_required_ifauth(fn):
+        """Check JWT unless authentication is disabled"""
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            if app.config['GRAMPS_AUTH_PROVIDER'] != 'none':
+                verify_jwt_in_request()
+            return fn(*args, **kwargs)
+        return wrapper
+
+    def jwt_refresh_token_required_ifauth(fn):
+        """Check JWT unless authentication is disabled"""
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            if app.config['GRAMPS_AUTH_PROVIDER'] != 'none':
+                verify_jwt_refresh_token_in_request()
+            return fn(*args, **kwargs)
+        return wrapper
+
     @app.route('/api/refresh', methods=['POST'])
-    @jwt_refresh_token_required
+    @jwt_refresh_token_required_ifauth
     def refresh():
+        if app.config['GRAMPS_AUTH_PROVIDER'] == 'none':
+            ret = { 'access_token': '1' }
+            return jsonify(ret), 200
         current_user = get_jwt_identity()
         ret = {
             'access_token': create_access_token(identity=current_user)
@@ -172,7 +200,7 @@ def create_app():
 
 
     class ProtectedResource(Resource):
-        method_decorators = [jwt_required]
+        method_decorators = [jwt_required_ifauth]
 
 
     class People(ProtectedResource):
@@ -278,13 +306,13 @@ def create_app():
             return FileHandler(handle, info)
 
     @app.route('/api/media/<string:handle>')
-    @jwt_required
+    @jwt_required_ifauth
     def show_image(handle):
         handler = get_media_handler(handle)
         return handler.send_file()
 
     @app.route('/api/thumbnail/<string:handle>/<int:size>')
-    @jwt_required
+    @jwt_required_ifauth
     @cache.cached()
     def show_thumbnail_square(handle, size):
         handler = get_media_handler(handle)
@@ -292,7 +320,7 @@ def create_app():
 
 
     @app.route('/api/thumbnail/<string:handle>/<int:size>/<int:x1>/<int:y1>/<int:x2>/<int:y2>')
-    @jwt_required
+    @jwt_required_ifauth
     @cache.cached()
     def show_thumbnail_square_cropped(handle, size, x1, y1, x2, y2):
         handler = get_media_handler(handle)

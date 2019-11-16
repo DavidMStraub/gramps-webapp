@@ -12,10 +12,13 @@ def cli():
 
 @cli.group()
 @click.option("-O", "--open", help="Family tree to use")
+@click.option("--no-auth", help="Disable authentication", is_flag=True)
 @click.pass_context
-def app(ctx, open):
+def app(ctx, open, no_auth):
     if open:
         os.environ["TREE"] = open
+    if no_auth:
+        os.environ["GRAMPS_AUTH_PROVIDER"] = 'none'
     ctx.obj = create_app()
 
 
