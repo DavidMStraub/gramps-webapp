@@ -23,7 +23,7 @@ from flask_restful import Api, Resource, reqparse
 
 from .auth import SingleUser, SQLAuth
 from .db import Db
-from .gramps import (get_db_info, get_events, get_families, get_media_info,
+from .gramps import (get_db_info, get_events, get_families, get_languages, get_media_info,
                      get_people, get_places, get_translation,
                      get_citations, get_sources, get_repositories,
                      get_note, get_media)
@@ -274,9 +274,15 @@ def create_app():
             args = parser.parse_args()
             try:
                 strings = json.loads(args['strings'])
+                lang = args.get('lang')
             except (json.decoder.JSONDecodeError, TypeError, ValueError) as e:
                 return {"error": str(e)}
-            return {"data": get_translation(strings)}
+            return {"data": get_translation(strings, lang=lang)}
+
+    class Languages(Resource):
+        @cache.cached()
+        def get(self):
+            return {"data": get_languages()}
 
     class Note(ProtectedResource):
         @cache.cached(query_string=True)
@@ -294,6 +300,7 @@ def create_app():
     api.add_resource(MediaObjects, '/api/mediaobjects')
     api.add_resource(Repositories, '/api/repositories')
     api.add_resource(Translate, '/api/translate')
+    api.add_resource(Languages, '/api/languages')
     api.add_resource(DbInfo, '/api/dbinfo')
     api.add_resource(FullTree, '/api/tree')
     api.add_resource(Note, '/api/note/<string:gramps_id>')

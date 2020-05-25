@@ -10,6 +10,7 @@ from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.lib import NoteType
 from gramps.gen.utils.db import get_marriage_or_fallback
 from gramps.gen.utils.file import expand_media_path
+from gramps.gen.utils.grampslocale import _LOCALE_NAMES, GrampsLocale
 from gramps.gen.utils.location import get_main_location
 from gramps.gen.utils.place import conv_lat_lon
 from gramps.plugins.lib.libhtml import Html
@@ -17,8 +18,6 @@ from gramps.plugins.lib.libhtmlbackend import HtmlBackend, process_spaces
 
 nd = NameDisplay()
 dd = GRAMPS_LOCALE.date_displayer
-_ = GRAMPS_LOCALE.translation.sgettext
-
 
 
 ALLOWED_TAGS = [
@@ -488,10 +487,16 @@ def get_media(tree):
     return {m.handle: media_to_dict(db, m) for m in db.iter_media()}
 
 
-def get_translation(strings):
+def get_translation(strings, lang=None):
     """Return the translation of all the given strings for the current locale."""
-    return {s: _(s) for s in strings}
+    if lang is not None:
+        gramps_locale = GrampsLocale(lang=lang)
+    else:
+        gramps_locale = GRAMPS_LOCALE
+    return {s: gramps_locale.translation.sgettext(s) for s in strings}
 
+def get_languages():
+    return _LOCALE_NAMES
 
 def get_media_info(tree, handle):
     """Return a dictionary with information about the media object."""
