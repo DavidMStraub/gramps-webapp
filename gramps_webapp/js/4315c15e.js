@@ -1,0 +1,1 @@
+let e,s=e=>e;import{S as t,h as o}from"./8144a6f8.js";import{P as a}from"./373bcc3c.js";window.customElements.define("gr-view404",class extends a{static get styles(){return[t]}render(){return o(e||(e=s` <section> <h2>Oops! You hit a 404</h2> <p> The page you're looking for doesn't seem to exist. Head back <a href="/">home</a> and try again? </p> </section> `))}});
