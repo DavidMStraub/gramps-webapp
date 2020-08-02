@@ -125,10 +125,6 @@ def create_app():
     def send_js_index():
         return send_from_directory(app.static_folder, 'index.html')
 
-    @app.route('/env.js')
-    def show_env_js():
-        return Response("window.APIHOST = '';\n", content_type='text/javascript')
-
     @app.route('/<path:path>', methods=['GET', 'POST'])
     def send_js(path):
         if path and os.path.exists(os.path.join(app.static_folder, path)):
