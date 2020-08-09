@@ -5,9 +5,11 @@ the [Gramps](https://gramps-project.org) software. It allows to share
 your genalogical research with family members or provides an alternative
 way of browsing your records on your local computer.
 
+![](screenshot.png)
+
 ## Demo
 
-There is a [demo instance](https://agile-bayou-66821.herokuapp.com) using Gramps's example family tree database. Use "test" for user and password.
+There is a [demo instance](https://mysterious-cove-02458.herokuapp.com) using Gramps's example family tree database. Use `test` for username and password.
 
 (NB: initial startup of the demo can take up to a minute since it is hosted on a free Heroku dyno that sleeps after 30 mins of inactivity.)
 
@@ -23,7 +25,7 @@ The project is still in an early stage. Please use the issue system to report pr
 
 - REST API to the Gramps database based on [Flask](https://palletsprojects.com/p/flask/) and [Flask-RESTful](https://flask-restful.readthedocs.io/) and directly using the Gramps Python package
 - Authentication system using JSON web tokens (using [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/))
-- Progressive web app frontend based on [PWA Starter Kit](https://pwa-starter-kit.polymer-project.org/)
+- Progressive web app frontend based on [PWA Starter Kit](https://pwa-starter-kit.polymer-project.org/) and [Open WC](https://open-wc.org/)
 
 ## Features
 
@@ -62,7 +64,7 @@ The `--no-auth` option disables the user system (the login form will still be sh
 
 ## Deploying to the web
 
-Instructions will follow.
+See the [Wiki](https://github.com/DavidMStraub/gramps-webapp/wiki).
 
 ## Configuration
 
@@ -77,7 +79,9 @@ This is a list of environment variables that affect the web app.
 | `GRAMPS_AUTH_PROVIDER` | Authentication method to use. Possible values: `password` or `sql` (default). |
 | `PASSWORD` | User password in case of using password authentication. Empty by default (!) |
 | `GRAMPS_USER_DB_URI` | SQLAlchemy compatible URI for the user database when using SQL authentication. |
-| `GRAMPS_S3_BUCKET_NAME` | S3 bucket name when using AWS cloud storage for media files. See [the documentation](https://github.com/DavidMStraub/gramps-webapp/wiki/Storing-media-objects-on-S3) for details. |
+| `GRAMPS_S3_BUCKET_NAME` | S3 bucket name when using AWS cloud storage for media files. See [the documentation](https://github.com/DavidMStraub/gramps-webapp/wiki/Storing-media-objects-on-S3) for details.
+
+
 
 
 ## Current limitations
