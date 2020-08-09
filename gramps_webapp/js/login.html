@@ -1,0 +1,121 @@
+<!doctype html>
+
+<html lang="en">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+
+<head>
+  <meta charset="utf-8">
+  <title>Login</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    html {
+      display: table;
+      margin: auto;
+    }
+
+    body {
+      display: table-cell;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+
+  <form id="login-form" action="/">
+
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="username" type="text">
+        <label for="password">Username</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="password" type="password">
+        <label for="password">Password</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input class="btn brown" type="submit" value="Sign in">
+      </div>
+    </div>
+  </form>
+
+  <script>
+
+    localStorage.clear();
+
+    function storeToken(data) {
+      let expires = Date.now() + 15 * 60 * 1000;
+      localStorage.setItem('gramps_webapp', JSON.stringify({
+        api: {
+          people: {},
+          families: {},
+          events: {},
+          places: {},
+          citations: {},
+          sources: {},
+          repositories: {},
+          media: {},
+          strings: {},
+          dbinfo: {},
+          notes: {},
+          token: data.access_token,
+          expires: expires,
+          refresh_token: data.refresh_token
+        },
+        app: {
+          page: '',
+          offline: false,
+          drawerOpened: false,
+          lightboxOpened: false,
+          snackbarOpened: false,
+        }
+      }));
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      var username = form.elements["username"].value;
+      var password = form.elements["password"].value;
+      fetch(`/api/login`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 'username': username, 'password': password })
+      })
+        .then(resp => {
+          if (resp.status == 401) {
+            throw Error('Incorrect username or password');
+          }
+          return resp.json()
+        })
+        .then(data => {
+          storeToken(data);
+        })
+        .then(() => document.location.href = '/')
+        .catch((error) => {
+          M.toast({ html: error });
+          console.log(error);
+        })
+    }
+
+
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', handleSubmit);
+  </script>
+</body>
+
+</html>
