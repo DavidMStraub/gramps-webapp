@@ -1,3 +1,5 @@
+jwt_secret_key
+appcache
 .directory
 
 # Byte-compiled / optimized / DLL files
