@@ -99,6 +99,8 @@
         .then(resp => {
           if (resp.status == 401) {
             throw Error('Incorrect username or password');
+          } else if (resp.status == 429) {
+            throw Error('Too many requests');
           }
           return resp.json()
         })

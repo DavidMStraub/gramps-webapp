@@ -35,6 +35,9 @@ from flask_jwt_extended import (
 )
 from flask_restful import Api, Resource, reqparse
 
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 from .auth import SingleUser, SQLAuth
 from .db import Db
 from .gramps import (
@@ -132,6 +135,8 @@ def create_app():
     app.logger.setLevel(logging.INFO)
     app.logger.info("Opening family tree '{}'".format(app.config["TREE"]))
 
+    limiter = Limiter(app, key_func=get_remote_address)
+
     # called once here in case Db's constructor raises
     Db(app.config["TREE"])
 
@@ -159,6 +164,7 @@ def create_app():
             return send_from_directory(app.static_folder, "index.html")
 
     @app.route("/api/login", methods=["POST"])
+    @limiter.limit("1/second")
     def login():
         if app.config["GRAMPS_AUTH_PROVIDER"] == "none":
             ret = {"access_token": "1", "refresh_token": "1"}
