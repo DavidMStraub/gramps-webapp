@@ -1,1 +1,0 @@
-import{i as e,j as s,k as i}from"./b4d29789.js";const r={observers:["_focusedChanged(receivedFocusFromKeyboard)"],_focusedChanged:function(e){e&&this.ensureRipple(),this.hasRipple()&&(this._ripple.holdDown=e)},_createRipple:function(){var s=e._createRipple();return s.id="ink",s.setAttribute("center",""),s.classList.add("circle"),s}},t=[s,i,e,r];export{t as P,r as a};
