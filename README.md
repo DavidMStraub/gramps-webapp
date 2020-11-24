@@ -1,5 +1,7 @@
 # Gramps Web App
 
+⚠ **Note: this project is now deprecated and will be replaced by the "official" [Gramps REST API](https://github.com/gramps-project/web-api) in combination with the [Gramps.js](https://github.com/DavidMStraub/Gramps.js) frontend.**
+
 This package provides a web frontend to the genealogical database of
 the [Gramps](https://gramps-project.org) software. It allows to share
 your genalogical research with family members or provides an alternative
